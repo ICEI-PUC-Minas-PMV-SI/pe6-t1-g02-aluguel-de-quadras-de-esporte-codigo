@@ -18,8 +18,6 @@ public class Agendamento extends Entity<AgendamentoID> {
     private final Instant inicioAgendamento;
     private final Instant fimAgendamento;
 
-    //padrão factory method
-
     private Agendamento(AgendamentoID id, AgendamentoStatus status, Quadra quadra, Usuario usuario, Instant inicioAgendamento, Instant fimAgendamento) {
         this.id = id;
         this.status = status;
