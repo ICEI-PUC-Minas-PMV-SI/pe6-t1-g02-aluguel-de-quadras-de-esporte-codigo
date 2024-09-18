@@ -15,4 +15,8 @@ public interface AgendamentoMySQLRepository extends JpaRepository<AgendamentoJpa
 //    Set<AgendamentoJpaEntity> getAgendamentosByUsuario(@Param("usuario") String usuario);
 
     Set<AgendamentoJpaEntity> getAgendamentosByUsuario(String usuario);
+
+//    Set<AgendamentoJpaEntity> getAgendamentos();
+//    @Query(value = "SELECT COUNT * FROM agendamentos", nativeQuery = true)
+//    Set<AgendamentoJpaEntity> getAgendamentos();
 }

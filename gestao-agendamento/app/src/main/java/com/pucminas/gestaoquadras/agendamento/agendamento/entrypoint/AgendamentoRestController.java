@@ -5,9 +5,11 @@ import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.Ag
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.ListarAgendamentosPorUsuarioRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.AgendarQuadraResponse;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.ListarAgendamentosPorUsuarioResponse;
+import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.ListarAgendamentosResponse;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.AgendarQuadraUsecase;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.CancelarAgendamentoUsecase;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.ListarAgendamentosPorUsuarioUsecase;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.ListarAgendamentosUsecase;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.AgendarQuadraUsecaseInput;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.CancelarAgendamentoUsecaseInput;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseInput;
@@ -25,12 +27,14 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
     private final AgendarQuadraUsecase agendarQuadraUsecase;
     private final CancelarAgendamentoUsecase cancelarAgendamentoUseCase;
     private final ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase;
+    private final ListarAgendamentosUsecase listarAgendamentosUsecase;
 
     @Inject
-    public AgendamentoRestController(final AgendarQuadraUsecase agendarQuadraUsecase, final CancelarAgendamentoUsecase cancelarAgendamentoUseCase, ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase) {
+    public AgendamentoRestController(final AgendarQuadraUsecase agendarQuadraUsecase, final CancelarAgendamentoUsecase cancelarAgendamentoUseCase, ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase, ListarAgendamentosUsecase listarAgendamentosUsecase) {
         this.agendarQuadraUsecase = Objects.requireNonNull(agendarQuadraUsecase);
         this.cancelarAgendamentoUseCase = Objects.requireNonNull(cancelarAgendamentoUseCase);
         this.listarAgendamentosPorUsuarioUsecase = Objects.requireNonNull(listarAgendamentosPorUsuarioUsecase);
+        this.listarAgendamentosUsecase = Objects.requireNonNull(listarAgendamentosUsecase);
     }
 
     @Override
@@ -73,6 +77,15 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
         final var response = new ListarAgendamentosPorUsuarioResponse(
              usecaseOutput.agendamentos()
         );
+
+        return ResponseEntity.ok(response.agendamentos());
+    }
+
+    @Override
+    public ResponseEntity<Set<Agendamento>> listarAgendamentos() {
+        final var usecaseOutput = listarAgendamentosUsecase.execute();
+
+        final var response = new ListarAgendamentosResponse(usecaseOutput.agendamentos());
 
         return ResponseEntity.ok(response.agendamentos());
     }

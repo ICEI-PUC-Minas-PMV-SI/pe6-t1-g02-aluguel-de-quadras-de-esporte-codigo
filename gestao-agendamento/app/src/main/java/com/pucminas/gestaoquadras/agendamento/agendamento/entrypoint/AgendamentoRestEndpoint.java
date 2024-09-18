@@ -35,4 +35,9 @@ public interface AgendamentoRestEndpoint {
     ) ResponseEntity<Set<Agendamento>> listarAgendamentosPorUsuario(
             @RequestBody ListarAgendamentosPorUsuarioRequest request
     );
+
+    @GetMapping(
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    ) ResponseEntity<Set<Agendamento>> listarAgendamentos();
 }
