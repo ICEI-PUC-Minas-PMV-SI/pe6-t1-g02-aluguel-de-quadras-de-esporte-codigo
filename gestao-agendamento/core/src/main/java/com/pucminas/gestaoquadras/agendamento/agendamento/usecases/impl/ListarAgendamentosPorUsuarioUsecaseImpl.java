@@ -1,6 +1,7 @@
 package com.pucminas.gestaoquadras.agendamento.agendamento.usecases.impl;
 
 import com.pucminas.gestaoquadras.agendamento.agendamento.dataprovider.AgendamentoGateway;
+import com.pucminas.gestaoquadras.agendamento.agendamento.exceptions.NotFoundException;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.ListarAgendamentosPorUsuarioUsecase;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseInput;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseOutput;
@@ -20,6 +21,11 @@ public class ListarAgendamentosPorUsuarioUsecaseImpl implements ListarAgendament
     @Override
     public ListarAgendamentosPorUsuarioUsecaseOutput execute(ListarAgendamentosPorUsuarioUsecaseInput input) {
         final var agendamentos = agendamentoGateway.getAgendamentosByUsuario(input.usuario());
+
+        if (Objects.isNull(agendamentos) || agendamentos.isEmpty()) {
+            throw new NotFoundException("Agendamento não encontrado!");
+        }
+
         return new ListarAgendamentosPorUsuarioUsecaseOutput(agendamentos);
     }
 }
