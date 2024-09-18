@@ -25,7 +25,7 @@ public class CancelarAgendamentoUsecaseImpl implements CancelarAgendamentoUsecas
         final var agendamento = agendamentoGateway.getAgendamentoById(AgendamentoID.from(input.idAgendamento()));
 
         if (agendamento.getStatus() == AgendamentoStatus.CANCELADO) {
-            throw new AgendamentoException("Esse agendamento já está cancelado!");
+            throw new AgendamentoException("Esse agendamento já foi cancelado!");
         }
 
         agendamento.setStatus(AgendamentoStatus.CANCELADO);
