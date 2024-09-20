@@ -2,6 +2,7 @@ package com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint;
 
 import com.pucminas.gestaoquadras.agendamento.agendamento.Agendamento;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.AgendarQuadraRequest;
+import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.EditarAgendamentoRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.ListarAgendamentosPorUsuarioRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,4 +41,11 @@ public interface AgendamentoRestEndpoint {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     ) ResponseEntity<Set<Agendamento>> listarAgendamentos();
+
+    @PatchMapping(
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    ) ResponseEntity<?> editarAgendamento(
+            @RequestBody EditarAgendamentoRequest request
+    );
 }
