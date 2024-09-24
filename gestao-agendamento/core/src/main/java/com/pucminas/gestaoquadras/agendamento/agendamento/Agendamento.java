@@ -15,8 +15,8 @@ public class Agendamento extends Entity<AgendamentoID> {
     private AgendamentoStatus status;
     private final Quadra quadra;
     private final Usuario usuario;
-    private Instant inicioAgendamento;
-    private Instant fimAgendamento;
+    private final Instant inicioAgendamento;
+    private final Instant fimAgendamento;
 
     private Agendamento(AgendamentoID id, AgendamentoStatus status, Quadra quadra, Usuario usuario, Instant inicioAgendamento, Instant fimAgendamento) {
         this.id = id;

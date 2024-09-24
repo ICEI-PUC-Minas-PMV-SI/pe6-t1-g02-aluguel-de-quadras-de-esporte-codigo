@@ -2,7 +2,6 @@ package com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint;
 
 import com.pucminas.gestaoquadras.agendamento.agendamento.Agendamento;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.AgendarQuadraRequest;
-import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.EditarAgendamentoRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.ListarAgendamentosPorUsuarioRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.AgendarQuadraResponse;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.ListarAgendamentosPorUsuarioResponse;
@@ -27,20 +26,16 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
     private final ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase;
     private final ListarAgendamentosUsecase listarAgendamentosUsecase;
 
-    private final EditarAgendamentoUsecase editarAgendamentoUsecase;
-
     @Inject
     public AgendamentoRestController(
             final AgendarQuadraUsecase agendarQuadraUsecase,
             final CancelarAgendamentoUsecase cancelarAgendamentoUseCase,
             final ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase,
-            final ListarAgendamentosUsecase listarAgendamentosUsecase,
-            final EditarAgendamentoUsecase editarAgendamentoUsecase) {
+            final ListarAgendamentosUsecase listarAgendamentosUsecase) {
         this.agendarQuadraUsecase = Objects.requireNonNull(agendarQuadraUsecase);
         this.cancelarAgendamentoUseCase = Objects.requireNonNull(cancelarAgendamentoUseCase);
         this.listarAgendamentosPorUsuarioUsecase = Objects.requireNonNull(listarAgendamentosPorUsuarioUsecase);
         this.listarAgendamentosUsecase = Objects.requireNonNull(listarAgendamentosUsecase);
-        this.editarAgendamentoUsecase = Objects.requireNonNull(editarAgendamentoUsecase);
     }
 
     @Override
@@ -94,17 +89,5 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
         final var response = new ListarAgendamentosResponse(usecaseOutput.agendamentos());
 
         return ResponseEntity.ok(response.agendamentos());
-    }
-
-    @Override
-    public ResponseEntity<?> editarAgendamento(EditarAgendamentoRequest request) {
-        editarAgendamentoUsecase.execute(
-                new EditarAgendamentoUsecaseInput(
-                        request.agendamentoId(),
-                        request.inicioAgendamento(),
-                        request.fimAgendamento()
-                )
-        );
-        return ResponseEntity.noContent().build();
     }
 }
