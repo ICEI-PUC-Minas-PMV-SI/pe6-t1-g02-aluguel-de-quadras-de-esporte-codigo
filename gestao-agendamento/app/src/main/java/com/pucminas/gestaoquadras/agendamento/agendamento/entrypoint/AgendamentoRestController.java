@@ -10,7 +10,6 @@ import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.L
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.*;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.AgendarQuadraUsecaseInput;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.CancelarAgendamentoUsecaseInput;
-import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.EditarAgendamentoUsecaseInput;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseInput;
 import com.pucminas.gestaoquadras.agendamento.usuario.Usuario;
 import jakarta.inject.Inject;

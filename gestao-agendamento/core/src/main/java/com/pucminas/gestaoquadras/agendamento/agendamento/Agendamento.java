@@ -97,12 +97,4 @@ public class Agendamento extends Entity<AgendamentoID> {
     public Instant getFimAgendamento() {
         return fimAgendamento;
     }
-
-    public void setInicioAgendamento(Instant novoHorarioInicio) {
-        this.inicioAgendamento = novoHorarioInicio;
-    }
-
-    public void setFimAgendamento(Instant novoHorarioFim) {
-        this.fimAgendamento = novoHorarioFim;
-    }
 }
