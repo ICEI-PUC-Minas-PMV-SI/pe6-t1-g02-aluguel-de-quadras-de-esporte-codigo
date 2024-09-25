@@ -1,4 +1,10 @@
 package com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto;
 
-public class ListarAgendamentosPorUsuarioUsecaseOutput {
+import com.pucminas.gestaoquadras.agendamento.agendamento.Agendamento;
+
+import java.util.Set;
+
+public record ListarAgendamentosPorUsuarioUsecaseOutput(
+        Set<Agendamento> agendamentos
+) {
 }
