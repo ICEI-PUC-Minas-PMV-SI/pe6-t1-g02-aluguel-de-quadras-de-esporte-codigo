@@ -119,13 +119,4 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
                 );
         return ResponseEntity.noContent().build();
     }
-
-    @Override
-    public ResponseEntity<Set<Agendamento>> listarAgendamentos() {
-        final var usecaseOutput = listarAgendamentosUsecase.execute();
-
-        final var response = new ListarAgendamentosResponse(usecaseOutput.agendamentos());
-
-        return ResponseEntity.ok(response.agendamentos());
-    }
 }

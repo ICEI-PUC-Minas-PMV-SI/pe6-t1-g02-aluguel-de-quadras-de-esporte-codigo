@@ -75,7 +75,7 @@ public interface AgendamentoRestEndpoint {
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
-    ) ResponseEntity<Set<Agendamento>> listarAgendamentos();
+    )
     @Operation(
             summary = "Cancelar agendamento",
             description = "Cancela um agendamento específico"
@@ -127,7 +127,7 @@ public interface AgendamentoRestEndpoint {
             description = "Lista os usuários que já agendaram a quadra"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Agendamentos listados com sucesso",
+            @ApiResponse(responseCode = "200", description = "Agendamentos listados com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ListarAgendamentosPorQuadraUsecaseOutput.class)
