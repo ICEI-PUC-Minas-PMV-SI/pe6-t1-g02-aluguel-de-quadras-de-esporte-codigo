@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: root
+    password: 123456
+    url: jdbc:h2:mem:gestao-quadra-usuarios;MODE=MYSQL;DATABASE_TO_LOWER=TRUE
+  application:
+    name: usuarios
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      "[hibernate.dialect]": org.hibernate.dialect.MySQL8Dialect
+      "[hibernate.generate_statistics]": false
+      "[hibernate.connection.provider_disables_autocommit]": true
+
+
+security:
+  jwt:
+    secret-key: g+Lhv2mWOoS/1kO1jyaj9+5uEqsNeJUb7kI+LOogc5cVlxhwNJG2+Dhsa4SRfQnxMd7YBDz1q49z2hjUqp6XFA==
+    expiration-time: 86400000
+

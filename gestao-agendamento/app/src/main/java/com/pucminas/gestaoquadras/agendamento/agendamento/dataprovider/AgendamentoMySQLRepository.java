@@ -15,4 +15,6 @@ public interface AgendamentoMySQLRepository extends JpaRepository<AgendamentoJpa
 //    Set<AgendamentoJpaEntity> getAgendamentosByUsuario(@Param("usuario") String usuario);
 
     Set<AgendamentoJpaEntity> getAgendamentosByUsuario(String usuario);
+
+    Set<AgendamentoJpaEntity> findAgendamentosByQuadra(String quadra);
 }

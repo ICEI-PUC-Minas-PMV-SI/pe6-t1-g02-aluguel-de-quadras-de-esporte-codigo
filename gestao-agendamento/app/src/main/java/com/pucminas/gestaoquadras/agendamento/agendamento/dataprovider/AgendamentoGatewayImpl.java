@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,8 +41,18 @@ public class AgendamentoGatewayImpl implements AgendamentoGateway {
     }
 
     @Override
-    public Integer getCountAgendamentosByQuadraEHorario(Quadra quadra, Instant inicioAgendamento, Instant fimAgendamento) {
-        return 0;
+    public Set<Agendamento> getAgendamentosByQuadra(Quadra quadra) {
+        return this
+                .repository
+                .findAgendamentosByQuadra(quadra.quadraId())
+                .stream()
+                .map(AgendamentoMapper::toDomain)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> getCountAgendamentosByQuadraEHorario(Quadra quadra, Instant inicioAgendamento, Instant fimAgendamento) {
+        return new HashSet<>();
     }
 
     @Override

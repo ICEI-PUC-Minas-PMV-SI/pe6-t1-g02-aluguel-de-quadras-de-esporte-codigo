@@ -34,3 +34,8 @@ spring:
 microservices:
   usuario: /
   agendamento: /
+
+security:
+  jwt:
+    secret-key: g+Lhv2mWOoS/1kO1jyaj9+5uEqsNeJUb7kI+LOogc5cVlxhwNJG2+Dhsa4SRfQnxMd7YBDz1q49z2hjUqp6XFA==
+    expiration-time: 86400000

@@ -1,0 +1,11 @@
+package com.pucminas.gestaoquadras.agendamento.agendamento.usecases;
+
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorQuadraUsecaseInput;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorQuadraUsecaseOutput;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseInput;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseOutput;
+
+public interface ListarAgendamentosPorQuadraUsecase {
+
+    ListarAgendamentosPorQuadraUsecaseOutput execute(ListarAgendamentosPorQuadraUsecaseInput input);
+}

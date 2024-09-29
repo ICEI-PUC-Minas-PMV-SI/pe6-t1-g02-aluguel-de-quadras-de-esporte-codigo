@@ -15,8 +15,8 @@ public class Agendamento extends Entity<AgendamentoID> {
     private AgendamentoStatus status;
     private final Quadra quadra;
     private final Usuario usuario;
-    private final Instant inicioAgendamento;
-    private final Instant fimAgendamento;
+    private Instant inicioAgendamento;
+    private Instant fimAgendamento;
 
     //padrão factory method
 
@@ -74,6 +74,12 @@ public class Agendamento extends Entity<AgendamentoID> {
         if (Objects.isNull(this.quadra)) {
             throw new AgendamentoException("O agendamento deve ter uma quadra nao nula.");
         }
+    }
+
+    public void reagendar(Instant inicioAgendamento, Instant fimAgendamento) {
+        this.inicioAgendamento = inicioAgendamento;
+        this.fimAgendamento = fimAgendamento;
+        this.validate();
     }
 
     public AgendamentoStatus getStatus() {

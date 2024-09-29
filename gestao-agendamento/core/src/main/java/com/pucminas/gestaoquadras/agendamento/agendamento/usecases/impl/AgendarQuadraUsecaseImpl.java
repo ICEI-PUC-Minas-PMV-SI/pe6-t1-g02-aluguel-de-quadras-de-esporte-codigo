@@ -49,7 +49,7 @@ public class AgendarQuadraUsecaseImpl implements AgendarQuadraUsecase {
 
         final var agendamentosExistentes = agendamentoGateway.getCountAgendamentosByQuadraEHorario(quadra, input.inicioAgendamento(), input.fimAgendamento());
 
-        if(agendamentosExistentes > 0) {
+        if(!agendamentosExistentes.isEmpty()) {
             throw new AgendamentoException("A quadra ja esta agendada no horario desejado.");
         }
 
