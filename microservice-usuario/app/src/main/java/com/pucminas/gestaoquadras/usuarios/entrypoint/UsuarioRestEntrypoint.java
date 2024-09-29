@@ -146,7 +146,7 @@ public interface UsuarioRestEntrypoint {
             description = "Recupera um usuário específico"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuário recuperado com sucesso",
+            @ApiResponse(responseCode = "200", description = "Usuário recuperado com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = GetUsuarioUseCaseOutput.class)

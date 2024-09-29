@@ -3,6 +3,9 @@ package com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint;
 import com.pucminas.gestaoquadras.agendamento.agendamento.Agendamento;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.AgendarQuadraRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.ReagendarQuadraRequest;
+import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.AgendarQuadraResponse;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorQuadraUsecaseOutput;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseOutput;
 import com.pucminas.gestaoquadras.agendamento.configuration.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,10 +37,16 @@ public interface AgendamentoRestEndpoint {
             @ApiResponse(responseCode = "201", description = "Agendamento realizado com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = AgendarQuadraResponse.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "Usuário não autorizado",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class)
@@ -74,11 +83,16 @@ public interface AgendamentoRestEndpoint {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Agendamento cancelado com sucesso",
                     content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida",
+                    content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class)
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida",
+            @ApiResponse(responseCode = "401", description = "Usuário não autorizado",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class)
@@ -116,7 +130,7 @@ public interface AgendamentoRestEndpoint {
             @ApiResponse(responseCode = "204", description = "Agendamentos listados com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ListarAgendamentosPorQuadraUsecaseOutput.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
@@ -155,7 +169,7 @@ public interface AgendamentoRestEndpoint {
             @ApiResponse(responseCode = "200", description = "Agendamentos listados com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ListarAgendamentosPorUsuarioUsecaseOutput.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
@@ -192,11 +206,16 @@ public interface AgendamentoRestEndpoint {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Agendamento reagendado com sucesso",
                     content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida",
+                    content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class)
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida",
+            @ApiResponse(responseCode = "401", description = "Usuário não autorizado",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class)
