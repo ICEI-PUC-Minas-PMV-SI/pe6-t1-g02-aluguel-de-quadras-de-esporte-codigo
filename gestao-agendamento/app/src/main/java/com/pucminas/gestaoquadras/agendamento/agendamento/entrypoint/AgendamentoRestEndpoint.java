@@ -1,5 +1,6 @@
 package com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint;
 
+import com.pucminas.gestaoquadras.agendamento.agendamento.Agendamento;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.AgendarQuadraRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.ReagendarQuadraRequest;
 import com.pucminas.gestaoquadras.agendamento.configuration.exception.ErrorResponse;
@@ -14,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RequestMapping("api/v1/agendamentos")
 @Tag(name = "Agendamento")
@@ -63,7 +66,7 @@ public interface AgendamentoRestEndpoint {
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    ) ResponseEntity<Set<Agendamento>> listarAgendamentos();
     @Operation(
             summary = "Cancelar agendamento",
             description = "Cancela um agendamento específico"

@@ -32,6 +32,15 @@ public class AgendamentoGatewayImpl implements AgendamentoGateway {
     }
 
     @Override
+    public Set<Agendamento> getAgendamentos() {
+        final var agendamentosJpa = repository.findAll();
+        return agendamentosJpa
+                .stream()
+                .map(AgendamentoMapper::toDomain)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public Set<Agendamento> getAgendamentosByUsuario(Usuario usuario) {
         final var agendamentosJpa = repository.getAgendamentosByUsuario(usuario.id());
         return agendamentosJpa

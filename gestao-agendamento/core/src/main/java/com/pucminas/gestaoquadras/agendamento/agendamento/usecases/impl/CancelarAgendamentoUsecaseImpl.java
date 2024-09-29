@@ -4,7 +4,6 @@ import com.pucminas.gestaoquadras.agendamento.agendamento.dataprovider.Agendamen
 import com.pucminas.gestaoquadras.agendamento.agendamento.exceptions.AgendamentoException;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.CancelarAgendamentoUsecase;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.CancelarAgendamentoUsecaseInput;
-import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.CancelarAgendamentoUsecaseOutput;
 import com.pucminas.gestaoquadras.agendamento.agendamento.valueobjects.AgendamentoID;
 import com.pucminas.gestaoquadras.agendamento.agendamento.valueobjects.AgendamentoStatus;
 import jakarta.inject.Inject;
@@ -25,7 +24,7 @@ public class CancelarAgendamentoUsecaseImpl implements CancelarAgendamentoUsecas
         final var agendamento = agendamentoGateway.getAgendamentoById(AgendamentoID.from(input.idAgendamento()));
 
         if (agendamento.getStatus() == AgendamentoStatus.CANCELADO) {
-            throw new AgendamentoException("Esse agendamento já está cancelado!");
+            throw new AgendamentoException("Esse agendamento já foi cancelado!");
         }
 
         agendamento.setStatus(AgendamentoStatus.CANCELADO);

@@ -1,6 +1,7 @@
 package com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint;
 
 import com.pucminas.gestaoquadras.agendamento.agendamento.dataprovider.AgendamentoGateway;
+import com.pucminas.gestaoquadras.agendamento.agendamento.Agendamento;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.AgendarQuadraRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.requests.ReagendarQuadraRequest;
 import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.AgendarQuadraResponse;
@@ -9,6 +10,10 @@ import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.*;
 import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.*;
 import com.pucminas.gestaoquadras.agendamento.agendamento.valueobjects.AgendamentoID;
 import com.pucminas.gestaoquadras.agendamento.configuration.auth.User;
+import com.pucminas.gestaoquadras.agendamento.agendamento.entrypoint.responses.ListarAgendamentosResponse;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.AgendarQuadraUsecaseInput;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.CancelarAgendamentoUsecaseInput;
+import com.pucminas.gestaoquadras.agendamento.agendamento.usecases.dto.ListarAgendamentosPorUsuarioUsecaseInput;
 import jakarta.inject.Inject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Objects;
+import java.util.Set;
 
 @RestController
 public class AgendamentoRestController implements AgendamentoRestEndpoint {
@@ -25,6 +31,7 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
     private final ListarAgendamentosPorQuadraUsecase listarAgendamentosPorQuadraUsecase;
     private final ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase;
     private final AgendamentoGateway agendamentoGateway;
+    private final ListarAgendamentosUsecase listarAgendamentosUsecase;
 
     @Inject
     public AgendamentoRestController(
@@ -32,15 +39,17 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
             final CancelarAgendamentoUsecase cancelarAgendamentoUseCase,
             final ReagendarAgendamentoUsecase reagendarAgendamentoUsecase,
             final ListarAgendamentosPorQuadraUsecase listarAgendamentosPorQuadraUsecase,
+            final AgendamentoGateway agendamentoGateway,
             final ListarAgendamentosPorUsuarioUsecase listarAgendamentosPorUsuarioUsecase,
-            final AgendamentoGateway agendamentoGateway
-            ) {
+            final ListarAgendamentosUsecase listarAgendamentosUsecase
+    ) {
         this.agendarQuadraUsecase = Objects.requireNonNull(agendarQuadraUsecase);
         this.cancelarAgendamentoUseCase = Objects.requireNonNull(cancelarAgendamentoUseCase);
         this.reagendarAgendamentoUsecase = Objects.requireNonNull(reagendarAgendamentoUsecase);
         this.listarAgendamentosPorQuadraUsecase = Objects.requireNonNull(listarAgendamentosPorQuadraUsecase);
         this.listarAgendamentosPorUsuarioUsecase = Objects.requireNonNull(listarAgendamentosPorUsuarioUsecase);
         this.agendamentoGateway = Objects.requireNonNull(agendamentoGateway);
+        this.listarAgendamentosUsecase = Objects.requireNonNull(listarAgendamentosUsecase);
     }
 
     @Override
@@ -95,7 +104,6 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
 
     @Override
     public ResponseEntity<?> listarAgendamentosPorUsuario(String id, Authentication authentication) {
-        System.out.println(authentication.getPrincipal());
         return ResponseEntity
                 .ok(this.listarAgendamentosPorUsuarioUsecase
                         .execute(new ListarAgendamentosPorUsuarioUsecaseInput(id)
@@ -110,5 +118,14 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
                         new ReagendarAgendamentoUsecaseInput(id, request.inicioAgendamento(), request.fimAgendamento())
                 );
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Set<Agendamento>> listarAgendamentos() {
+        final var usecaseOutput = listarAgendamentosUsecase.execute();
+
+        final var response = new ListarAgendamentosResponse(usecaseOutput.agendamentos());
+
+        return ResponseEntity.ok(response.agendamentos());
     }
 }

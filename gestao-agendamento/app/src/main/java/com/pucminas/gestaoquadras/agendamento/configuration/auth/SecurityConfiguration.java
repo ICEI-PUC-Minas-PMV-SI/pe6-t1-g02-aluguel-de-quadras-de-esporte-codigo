@@ -45,8 +45,10 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
-                                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/v1/agendamentos").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/agendamentos/quadra/{id}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/agendamentos/usuario/{id}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
