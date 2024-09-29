@@ -31,7 +31,7 @@ public interface LoginRestEntrypoint {
             @ApiResponse(responseCode = "200", description = "Usuário logado com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = LoginResponse.class)
                     )
             ),
             @ApiResponse(responseCode = "401", description = "Credenciais inválidas",

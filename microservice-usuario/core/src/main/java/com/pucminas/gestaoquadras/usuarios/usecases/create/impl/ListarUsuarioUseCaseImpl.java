@@ -2,19 +2,16 @@ package com.pucminas.gestaoquadras.usuarios.usecases.create.impl;
 
 import com.pucminas.gestaoquadras.usuarios.dataprovider.UsuarioGateway;
 import com.pucminas.gestaoquadras.usuarios.usecases.create.ListarUsuarioUseCase;
-import com.pucminas.gestaoquadras.usuarios.usecases.create.dto.GetUsuarioUseCaseInput;
 import com.pucminas.gestaoquadras.usuarios.usecases.create.dto.GetUsuarioUseCaseOutput;
 import com.pucminas.gestaoquadras.usuarios.usecases.create.dto.ListarUsuarioUseCaseOutput;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Named
-public class ListarUsuarioUseCaseImpl implements ListarUsuarioUseCase
-{
-    private  final UsuarioGateway usuarioGateway;
+public class ListarUsuarioUseCaseImpl implements ListarUsuarioUseCase {
+    private final UsuarioGateway usuarioGateway;
 
     @Inject
     public ListarUsuarioUseCaseImpl(
@@ -28,21 +25,20 @@ public class ListarUsuarioUseCaseImpl implements ListarUsuarioUseCase
 
     @Override
     public ListarUsuarioUseCaseOutput listar() {
-       final var output= this.usuarioGateway.
-                listUser().stream().map(usuario -> {
-                    return new GetUsuarioUseCaseOutput(
-                            usuario .getId(),
-                            usuario.getCpf().getValue(),
-                            usuario.getCnpj().getValue(),
-                            usuario.getNome(),
-                            usuario.getTelefone(),
-                            usuario.getEmail().getValue(),
-                            usuario.getDataCriacao(),
-                            usuario.getDataUltimaAtualizacao(),
-                            usuario.getDataDelecao()
-                    );
-
-                }).toList();
-       return new ListarUsuarioUseCaseOutput(output);
+        final var output = this.usuarioGateway.
+                listUser().stream().map(usuario ->
+                        new GetUsuarioUseCaseOutput(
+                                usuario.getId(),
+                                usuario.getCpf() != null? usuario.getCpf().getValue(): null,
+                                usuario.getCnpj() != null? usuario.getCnpj().getValue(): null,
+                                usuario.getNome(),
+                                usuario.getTelefone(),
+                                usuario.getEmail().getValue(),
+                                usuario.getDataCriacao(),
+                                usuario.getDataUltimaAtualizacao(),
+                                usuario.getDataDelecao()
+                        )
+                ).toList();
+        return new ListarUsuarioUseCaseOutput(output);
     }
 }

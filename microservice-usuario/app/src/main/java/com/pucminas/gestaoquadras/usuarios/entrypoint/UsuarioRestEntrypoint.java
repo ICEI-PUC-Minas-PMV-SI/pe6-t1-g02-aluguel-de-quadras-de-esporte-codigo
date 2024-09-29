@@ -4,6 +4,8 @@ import com.pucminas.gestaoquadras.configuration.exception.ErrorResponse;
 import com.pucminas.gestaoquadras.usuarios.entrypoint.requests.CreateUserRequest;
 import com.pucminas.gestaoquadras.usuarios.entrypoint.requests.UpdateUserRequest;
 import com.pucminas.gestaoquadras.usuarios.entrypoint.responses.CreateUserResponse;
+import com.pucminas.gestaoquadras.usuarios.usecases.create.dto.GetUsuarioUseCaseOutput;
+import com.pucminas.gestaoquadras.usuarios.usecases.create.dto.ListarUsuarioUseCaseOutput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +41,7 @@ public interface UsuarioRestEntrypoint {
             @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = CreateUserResponse.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
@@ -73,8 +75,7 @@ public interface UsuarioRestEntrypoint {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Usuário editado com sucesso",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            mediaType = MediaType.APPLICATION_JSON_VALUE
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
@@ -116,7 +117,7 @@ public interface UsuarioRestEntrypoint {
             @ApiResponse(responseCode = "200", description = "Usuários listado com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ListarUsuarioUseCaseOutput.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
@@ -136,7 +137,6 @@ public interface UsuarioRestEntrypoint {
     ResponseEntity<?> listUser();
 
     @GetMapping(
-
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -149,7 +149,7 @@ public interface UsuarioRestEntrypoint {
             @ApiResponse(responseCode = "204", description = "Usuário recuperado com sucesso",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = GetUsuarioUseCaseOutput.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",
@@ -190,8 +190,7 @@ public interface UsuarioRestEntrypoint {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            mediaType = MediaType.APPLICATION_JSON_VALUE
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Requisição inválida",

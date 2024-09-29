@@ -17,4 +17,4 @@ COPY --from=builder /app/app/target/*.jar app.jar
 
 EXPOSE 8081
 ENV DOCKERIZE_VERSION v0.7.0
-RUN java -jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
