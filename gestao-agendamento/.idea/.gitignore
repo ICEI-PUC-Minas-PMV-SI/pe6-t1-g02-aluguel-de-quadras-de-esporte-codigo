@@ -12,3 +12,4 @@
 /bin/
 *.exe
 *.dll
+*.class
