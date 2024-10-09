@@ -55,7 +55,7 @@ public class UsuarioRestController implements UsuarioRestEntrypoint {
                 body.telefone(),
                 body.nome(),
                 CNPJ.of(body.cnpj()),
-               CPF.of(body.cpf())
+                CPF.of(body.cpf())
         );
 
         final var createUsecaseOutput = this.createUsuarioUseCase.create(createUsecaseInput);
