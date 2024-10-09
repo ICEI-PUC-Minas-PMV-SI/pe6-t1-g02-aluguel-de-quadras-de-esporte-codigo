@@ -1,5 +1,7 @@
 package com.pucminas.gestaoquadras.usuarios.entities.valueobjects;
 
+import java.util.Objects;
+
 public class CNPJ {
     private String value;
 
@@ -12,6 +14,13 @@ public class CNPJ {
     }
 
     public void validate() {
+        if (Objects.isNull(getValue()) || getValue().isEmpty()) {
+            throw new IllegalArgumentException("CNPJ deve ser informado");
+        }
+
+        if (getValue().length() != 14) {
+            throw new IllegalArgumentException("CNPJ deve conter 14 caracteres");
+        }
     }
 
     public static CNPJ of(final String value) {
