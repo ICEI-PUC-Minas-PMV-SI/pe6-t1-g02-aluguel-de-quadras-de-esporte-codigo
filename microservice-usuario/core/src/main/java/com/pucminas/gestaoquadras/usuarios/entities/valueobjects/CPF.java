@@ -1,6 +1,8 @@
 package com.pucminas.gestaoquadras.usuarios.entities.valueobjects;
 
 
+import java.util.Objects;
+
 public class CPF {
     private String value;
 
@@ -13,6 +15,13 @@ public class CPF {
     }
 
     public void validate() {
+        if (Objects.isNull(getValue()) || getValue().isEmpty()) {
+            throw new IllegalArgumentException("CPF deve ser informado");
+        }
+
+        if (getValue().length() != 11) {
+           throw new IllegalArgumentException("CPF deve conter 11 caracteres");
+        }
     }
 
     public static CPF of(final String value) {
