@@ -11,8 +11,8 @@ export default function Page() {
       {/* Left side (hidden on small screens) */}
       <div className="hidden lg:flex lg:w-1/2 bg-black items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Sports Court Scheduler</h1>
-          <p className="text-xl text-gray-300">Manage your court schedules with ease</p>
+          <h1 className="text-4xl font-bold text-white mb-4">Gestão de quadras esportivas</h1>
+          <p className="text-xl text-gray-300">Gerencie seus horários com facilidade</p>
         </div>
       </div>
 
@@ -36,15 +36,14 @@ export default function Page() {
                 <Input id="password" type="password" className="w-full border-gray-300" />
               </div>
               <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800">
-                Entrar
+                  Entrar
               </Button>
-              <Link href="/cadastro">
-                <Button className="w-full bg-red-500 text-white hover:bg-gray-800">
+              <Link className="space-y-2" href="/cadastro" >
+                <Button className="w-full bg text-white hover:bg-gray-800 mt-4">
                   Criar conta
                 </Button>
               </Link>
             </form>
-        
           </CardContent>
         </Card>
       </div>
