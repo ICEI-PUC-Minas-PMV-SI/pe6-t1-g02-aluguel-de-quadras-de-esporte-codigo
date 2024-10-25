@@ -5,10 +5,15 @@ import { headers } from 'next/headers'
 
 // Define the base URL for your API
 const API_BASE_URL = 'http://localhost:8081'
+const API_BASE_URL_USUARIOS = 'http://localhost:8080'
 
 // Create an axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
+})
+
+const apiUsuarios = axios.create({
+  baseURL: API_BASE_URL_USUARIOS
 })
 
 // Add a request interceptor to include the auth token
@@ -75,6 +80,10 @@ const apiService = {
   cancelarAgendamento: (id: string) => 
     api.delete(`/api/v1/agendamentos/${id}`, {headers: {'Content-Type': 'application/json'}, data:null}),
 
+  // Adicione este método ao apiService
+  criarUsuario: (userData: { nome: string; telefone: string; email: string; senha: string; cpf?: string; cnpj?: string }) => 
+  apiUsuarios.post('/api/v1/usuarios', userData),
+  
   // Add more API methods as needed...
 }
 

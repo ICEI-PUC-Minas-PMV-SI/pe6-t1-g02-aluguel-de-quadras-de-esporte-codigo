@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-// import { toast } from "@/components/ui/use-toast"
+import apiService from "@/app/shared/services/api-service"
 
 export default function UserRegistration() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -31,7 +33,7 @@ export default function UserRegistration() {
     }
   };
 
-  // Função para formatar CPF
+  // Funções de formatação de CPF e CNPJ
   const formatCPF = (value: string) => {
     value = value.replace(/\D/g, ""); // Remove tudo que não for dígito
     if (value.length > 11) value = value.substring(0, 11); // Limita a 11 dígitos
@@ -40,7 +42,6 @@ export default function UserRegistration() {
                 .replace(/(\d{3})(\d{2})/, "$1-$2"); // Adiciona hífen
   };
 
-  // Função para formatar CNPJ
   const formatCNPJ = (value: string) => {
     value = value.replace(/\D/g, ""); // Remove tudo que não for dígito
     if (value.length > 14) value = value.substring(0, 14); // Limita a 14 dígitos
@@ -72,15 +73,30 @@ export default function UserRegistration() {
     setFormData(prev => ({ ...prev, documentType: value, document: '' }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui você enviaria os dados para o backend
-    console.log(formData);
-    // toast({
-    //   title: "Registro enviado",
-    //   description: "Seus dados foram enviados com sucesso!",
-    // }, /* secondArgument */)
-  };
+  
+    // Mapeia os dados para o formato esperado pelo backend
+    const userData = {
+      nome: formData.name, // 'name' do frontend é 'nome' no backend
+      telefone: formData.phone, // 'phone' do frontend é 'telefone' no backend
+      email: formData.email,
+      senha: formData.password, // 'password' do frontend é 'senha' no backend
+      cpf: formData.documentType === 'cpf' ? formData.document.replace(/\D/g,'') : undefined,
+      cnpj: formData.documentType === 'cnpj' ? formData.document.replace(/\D/g,'') : undefined,
+    };
+  
+    try {
+      // Envia os dados formatados para o backend usando o apiService
+      const response = await apiService.criarUsuario(userData);
+      console.log('Registro enviado com sucesso:', response.data);
+      // Redirecionar para a tela de login após o registro bem-sucedido
+      router.push('/login');
+    } catch (error) {
+      console.error('Erro ao enviar registro:', error);
+      // Aqui você pode adicionar um toast de erro
+    }
+  };  
 
   return (
     <div className="max-w-md mx-auto mt-10">
