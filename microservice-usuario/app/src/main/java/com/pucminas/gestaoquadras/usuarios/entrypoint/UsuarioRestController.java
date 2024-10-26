@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
-
 @RestController
 public class UsuarioRestController implements UsuarioRestEntrypoint {
     private final CreateUsuarioUseCase createUsuarioUseCase;
