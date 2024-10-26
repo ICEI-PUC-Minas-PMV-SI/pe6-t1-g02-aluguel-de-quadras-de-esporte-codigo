@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
+import { RescheduleModal } from "../shared/custom-components/dialog"
 
 export default function Page() {
   return (
     <div className="min-h-screen flex">
+      <RescheduleModal></RescheduleModal>
       {/* Left side (hidden on small screens) */}
       <div className="hidden lg:flex lg:w-1/2 bg-black items-center justify-center">
         <div className="text-center">

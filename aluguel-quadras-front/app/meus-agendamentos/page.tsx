@@ -12,6 +12,7 @@ import { AuthProvider, useAuth } from '../shared/auth/auth-context'
 import apiService from '../shared/services/api-service'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
+import Agendamento from '../shared/services/types/agendamento'
 // Mock data for scheduled courts (empty for demonstration)
 // const scheduledCourts = [
 //   { id: 1, courtName: 'Tennis Court A', date: '2024-03-15', time: '14:00-15:00', location: 'Main Complex' },
@@ -40,11 +41,9 @@ function CourtManagement() {
   function cancelarAgendamento(id: string) {
     
     apiService.cancelarAgendamento(id).then(r=> {
-      console.log("cancelando agendamento")
-      let newAgendamentos = [...agendamentos]
+      let newAgendamentos: Agendamento[] = [...agendamentos]
       newAgendamentos.forEach(agendamento=> {
         if(agendamento.idAgendamento === id) {
-          console.log("agendamento encontrado")
         agendamento.status = "CANCELADO"
       }})
       setAgendamentos(newAgendamentos)
