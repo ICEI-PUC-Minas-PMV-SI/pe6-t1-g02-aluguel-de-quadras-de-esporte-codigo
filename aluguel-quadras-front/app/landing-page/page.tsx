@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, Users } from "lucide-react"
-import { AuthProvider } from "./shared/auth/auth-context"
-import { Navbar } from "./shared/custom-components/navbar"
+import { AuthProvider } from "../shared/auth/auth-context"
+import { Navbar } from "../shared/custom-components/navbar"
 
 export default function LandingPage() {
   return (
