@@ -82,9 +82,12 @@ const apiService = {
 
   // Adicione este método ao apiService
   criarUsuario: (userData: { nome: string; telefone: string; email: string; senha: string; cpf?: string; cnpj?: string }) => 
-  apiUsuarios.post('/api/v1/usuarios', userData),
+    apiUsuarios.post('/api/v1/usuarios', userData),
   
   // Add more API methods as needed...
+  editaUsuario: (userData: { senha: string; telefone: string; nome: string}, id: string) =>
+    apiUsuarios.put(`/api/v1/usuarios/${id}`) ,
+
 }
 
 export default apiService

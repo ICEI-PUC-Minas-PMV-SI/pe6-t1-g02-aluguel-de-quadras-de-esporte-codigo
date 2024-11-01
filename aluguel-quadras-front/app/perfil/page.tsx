@@ -1,6 +1,6 @@
 'use client'
 
-import { useDeferredValue, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,35 +11,55 @@ import apiService from "app/shared/services/api-service"
 import { AuthProvider, useAuth } from '../shared/auth/auth-context'
 
 export default function AlterarPerfil() {
-    const user = useAuth().user
+  const user = useAuth().user
   const { toast } = useToast()
   const [formData, setFormData] = useState({
-    nome: '',
-    telefone: '',
+    nome: user?.nome,
+    telefone: user?.telefone,
     senhaAtual: '',
     novaSenha: '',
     confirmarNovaSenha: ''
   })
+  const [passwordError, setPasswordError] = useState('')
 
-  useEffect(()=>{
-apiService.getUser(user.id).then((u)=>{
-console.log(u)
-})
-    
-  },[])
+  useEffect(() => {
+    if (user == null) {
+      alert("Sua sessão expirou!");
+      return
+    }
+
+    apiService.getUser(user.id).then((u) => {
+      console.log(u)
+    })
+  }, [])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const formatarTelefone = (telefone: string) => {
-    const numeros = telefone.replace(/\D/g, '')
-    if (numeros.length <= 10) {
-      return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
-    } else {
-      return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+    
+    if (name === 'novaSenha' || name === 'confirmarNovaSenha') {
+      if (name === 'novaSenha' && formData.confirmarNovaSenha && value !== formData.confirmarNovaSenha) {
+        setPasswordError('As senhas não coincidem')
+      } else if (name === 'confirmarNovaSenha' && value !== formData.novaSenha) {
+        setPasswordError('As senhas não coincidem')
+      } else {
+        setPasswordError('')
+      }
     }
   }
+
+  const formatarTelefone = (value: string) => {
+    value = value.replace(/\D/g, "");
+    if (value.length > 10) {
+      return `(${value.substring(0, 2)}) ${value.substring(2, 7)}-${value.substring(7, 11)}`;
+    } else if (value.length > 5) {
+      return `(${value.substring(0, 2)}) ${value.substring(2, 6)}-${value.substring(6, 10)}`;
+    } else if (value.length > 2) {
+      return `(${value.substring(0, 2)}) ${value.substring(2)}`;
+    } else {
+      return value;
+    }
+  };
 
   const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const telefoneFormatado = formatarTelefone(e.target.value)
@@ -49,23 +69,26 @@ console.log(u)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (formData.novaSenha !== formData.confirmarNovaSenha) {
+    if (passwordError) {
       toast({
         title: "Erro",
-        description: "As novas senhas não coincidem.",
+        description: "As senhas não coincidem.",
         variant: "destructive",
       })
       return
     }
 
+    const userData = {
+      senha: formData.senhaAtual,
+      telefone: formData.telefone ?? "",
+      nome: formData.nome ?? "",
+    };
+
     try {
-      const resposta = await apiService.atualizarPerfil({
-        nome: formData.nome,
-        telefone: formData.telefone.replace(/\D/g, ''),
-        senha: formData.novaSenha
-      })
+      const resposta = await apiService.editaUsuario(userData, user!!.id)
       
-      if (resposta.success) {
+      
+      if (resposta.data) {
         toast({
           title: "Sucesso",
           description: "Seu perfil foi atualizado com sucesso.",
@@ -93,76 +116,65 @@ console.log(u)
 
   return (
     <AuthProvider>
-    <Card className="w-full max-w-md mx-auto mt-10">
-      <CardHeader>
-        <CardTitle>Alterar Perfil</CardTitle>
-        <CardDescription>Atualize suas informações pessoais aqui.</CardDescription>
-      </CardHeader>
-      <Toaster></Toaster>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="nome">Nome</Label>
-            <Input
-              id="nome"
-              name="nome"
-              value={formData.nome}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="telefone">Telefone</Label>
-            <Input
-              id="telefone"
-              name="telefone"
-              value={formData.telefone}
-              onChange={handleTelefoneChange}
-              placeholder="(00) 00000-0000"
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="senhaAtual">Senha Atual</Label>
-            <Input
-              id="senhaAtual"
-              name="senhaAtual"
-              type="password"
-              value={formData.senhaAtual}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="novaSenha">Nova Senha</Label>
-            <Input
-              id="novaSenha"
-              name="novaSenha"
-              type="password"
-              value={formData.novaSenha}
-              onChange={handleInputChange}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="confirmarNovaSenha">Confirmar Nova Senha</Label>
-            <Input
-              id="confirmarNovaSenha"
-              name="confirmarNovaSenha"
-              type="password"
-              value={formData.confirmarNovaSenha}
-              onChange={handleInputChange}
-            />
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter>
-        <Button type="submit" className="w-full" onClick={handleSubmit}>Atualizar Perfil</Button>
-      </CardFooter>
-    </Card>
+      <Card className="w-full max-w-md mx-auto mt-10">
+        <CardHeader>
+          <CardTitle>Alterar Perfil</CardTitle>
+          <CardDescription>Atualize suas informações pessoais aqui.</CardDescription>
+        </CardHeader>
+        <Toaster />
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome</Label>
+              <Input
+                id="nome"
+                name="nome"
+                value={formData.nome}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="telefone">Telefone</Label>
+              <Input
+                id="telefone"
+                name="telefone"
+                value={formData.telefone}
+                onChange={handleTelefoneChange}
+                placeholder="(00) 00000-0000"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="novaSenha">Nova Senha</Label>
+              <Input
+                id="novaSenha"
+                name="novaSenha"
+                type="password"
+                value={formData.novaSenha}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmarNovaSenha">Confirmar Nova Senha</Label>
+              <Input
+                id="confirmarNovaSenha"
+                name="confirmarNovaSenha"
+                type="password"
+                value={formData.confirmarNovaSenha}
+                onChange={handleInputChange}
+              />
+              {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="w-full" onClick={handleSubmit}>Atualizar Perfil</Button>
+        </CardFooter>
+      </Card>
     </AuthProvider>
   )
 }

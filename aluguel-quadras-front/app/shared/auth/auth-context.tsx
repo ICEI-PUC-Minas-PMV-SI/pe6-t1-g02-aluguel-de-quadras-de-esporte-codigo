@@ -4,7 +4,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react'
 import Usuario from '../services/types/usuario'
 
 interface AuthContextType {
-  user: Omit<Usuario, 'telefone' | 'dataCriacao' | 'dataUltimaAtualizacao' | 'dataDelecao'> | null
+  user: Omit<Usuario, 'dataCriacao' | 'dataUltimaAtualizacao' | 'dataDelecao'> | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
