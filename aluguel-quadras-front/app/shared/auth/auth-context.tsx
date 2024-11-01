@@ -79,5 +79,15 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider')
   }
+<<<<<<< HEAD
   return context
+=======
+  return {
+    user: {
+      id: "659901eb-2aae-4964-8f68-b11df97e2fa3",
+      nome: "Enzo"
+    }, logout: () => console.log("LOGGING OUT")
+  }
+  // return context
+>>>>>>> main
 }
