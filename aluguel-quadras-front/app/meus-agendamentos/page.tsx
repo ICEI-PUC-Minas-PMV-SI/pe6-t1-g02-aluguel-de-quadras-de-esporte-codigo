@@ -13,6 +13,11 @@ import apiService from '../shared/services/api-service'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import Agendamento from '../shared/services/types/agendamento'
+import isoDateFormatter from '../shared/helpers/isoDateFormatter'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import ReagendarForm from './reagendarForm'
+
 // Mock data for scheduled courts (empty for demonstration)
 // const scheduledCourts = [
 //   { id: 1, courtName: 'Tennis Court A', date: '2024-03-15', time: '14:00-15:00', location: 'Main Complex' },
@@ -35,20 +40,37 @@ function CourtManagement() {
   const [agendamentos, setAgendamentos] = useState([])
   const [selectedCourt, setSelectedCourt] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [quadras, setQuadras] = useState(new Map())
   const user = useAuth().user
   const router = useRouter()
 
   function cancelarAgendamento(id: string) {
-    
+    console.log("cancelando agendamento")
     apiService.cancelarAgendamento(id).then(r=> {
       let newAgendamentos: Agendamento[] = [...agendamentos]
       newAgendamentos.forEach(agendamento=> {
         if(agendamento.idAgendamento === id) {
+          console.log("agendamento cancelado")
         agendamento.status = "CANCELADO"
       }})
       setAgendamentos(newAgendamentos)
     })
   }
+
+  useEffect(()=>{
+    console.log("chamando quadras")
+    agendamentos.map((agendamento)=>{
+      console.log(agendamento)
+      if(!quadras.get(agendamento.idQuadra)) {
+        apiService.buscarQuadras(agendamento.idQuadra)
+        .then(quadra => {
+          quadras.set(quadra.data.id, quadra.data);
+          console.log(quadras)
+        })
+      }
+
+    })
+  }, [agendamentos])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -92,21 +114,21 @@ function CourtManagement() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {/* <TableHead>Court</TableHead> */}
+                      <TableHead>Quadra</TableHead>
                       <TableHead>Data</TableHead>
-                      <TableHead>Horario</TableHead>
-                      {/* <TableHead>Location</TableHead> */}
+                      <TableHead>Horário</TableHead>
+                      <TableHead>Local</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Acoes</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {agendamentos.map((agendamento) => (
                       <TableRow key={agendamento.idAgendamento}>
-                        {/* <TableCell className="font-medium">{agendamento.courtName}</TableCell> */}
-                        <TableCell>{agendamento.dataInicio}</TableCell>
-                        <TableCell>{agendamento.dataFim}</TableCell>
-                        {/* <TableCell>{agendamento.location}</TableCell> */}
+                        <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.nome || `-`}</TableCell>
+                        <TableCell>{isoDateFormatter.formatDate(agendamento.dataInicio)}</TableCell>
+                        <TableCell>{isoDateFormatter.formatTime(agendamento.dataInicio)+ " - " + isoDateFormatter.formatTime(agendamento.dataFim)}</TableCell>
+                        <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.localizacao || `-`}</TableCell>
                         <TableCell>
                           <Badge variant={agendamento.status === 'CANCELADO' ? "destructive" : "default"}>{agendamento.status}</Badge>
                         </TableCell>
@@ -116,18 +138,19 @@ function CourtManagement() {
                               <div className="flex space-x-2">
                                 <Dialog>
                                   <DialogTrigger asChild>
-                                    <Button variant="outline" size="icon" onClick={() => setSelectedCourt(court)}>
+                                    <Button variant="outline" size="icon" onClick={() => 
+                                       setSelectedCourt(quadras.get(parseInt(agendamento.idQuadra)))
+                                      }>
                                       <Edit className="h-4 w-4" />
                                     </Button>
                                   </DialogTrigger>
                                   <DialogContent>
                                     <DialogHeader>
-                                      <DialogTitle>Edit Reservation</DialogTitle>
+                                      <DialogTitle>Reagendar quadra</DialogTitle>
                                     </DialogHeader>
-                                    <div className="py-4">
-                                      <p>Editing functionality would go here.</p>
-                                      <p>Court: {selectedCourt?.courtName}</p>
-                                    </div>
+                                      <ReagendarForm quadra={selectedCourt} agendamento={agendamento}>
+
+                                      </ReagendarForm>
                                   </DialogContent>
                                 </Dialog>
                                 <Button variant="destructive" size="icon" onClick={()=>cancelarAgendamento(agendamento.idAgendamento)}>

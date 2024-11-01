@@ -69,7 +69,7 @@ export function useAuth() {
   }
   return {
     user: {
-      id: "df0cc417-b9f2-4614-af79-01d254ef929a",
+      id: "659901eb-2aae-4964-8f68-b11df97e2fa3",
       nome: "Enzo"
     }, logout: () => console.log("LOGGING OUT")
   }

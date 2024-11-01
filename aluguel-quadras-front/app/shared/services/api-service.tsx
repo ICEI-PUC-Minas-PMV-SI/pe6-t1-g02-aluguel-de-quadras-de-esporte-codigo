@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
 // Define the base URL for your API
 const API_BASE_URL = 'http://localhost:8081'
 const API_BASE_URL_USUARIOS = 'http://localhost:8080'
+const API_BASE_URL_QUADRAS = 'http://localhost:8082'
 
 // Create an axios instance with default config
 const api = axios.create({
@@ -14,6 +15,10 @@ const api = axios.create({
 
 const apiUsuarios = axios.create({
   baseURL: API_BASE_URL_USUARIOS
+})
+
+const apiQuadras = axios.create({
+  baseURL: API_BASE_URL_QUADRAS
 })
 
 // Add a request interceptor to include the auth token
@@ -62,29 +67,30 @@ api.interceptors.response.use(
 
 const apiService = {
 
-  login: (email: string, password: string) => 
+  login: (email: string, password: string) =>
     api.post<LoginResponse>('/api/v1/login', { email, password }),
 
-  getUser: (id: string) => 
+  getUser: (id: string) =>
     api.get(`/api/v1/usuarios/${id}`),
-  
-  getAgendamentosByUser: (idUsuario: string) => 
-    api.get<{agendamentos: Agendamento[]}>(`/api/v1/agendamentos/usuario/${idUsuario}`, {headers: {'Content-Type': 'application/json'}, data:null}),
-  
-  criarAgendamento: (agendamento: Omit<Agendamento, 'id'>) => 
+
+  getAgendamentosByUser: (idUsuario: string) =>
+    api.get<{ agendamentos: Agendamento[] }>(`/api/v1/agendamentos/usuario/${idUsuario}`, { headers: { 'Content-Type': 'application/json' }, data: null }),
+
+  criarAgendamento: (agendamento: Omit<Agendamento, 'id'>) =>
     api.post<Agendamento>('/api/v1/agendamentos/', agendamento),
-  
-  reagendar: (id: string, reservation: Partial<Agendamento>) => 
+
+  reagendar: (id: string, reservation: Partial<Agendamento>) =>
     api.put<Agendamento>(`/api/v1/agendamentos/${id}`, reservation),
-  
-  cancelarAgendamento: (id: string) => 
-    api.delete(`/api/v1/agendamentos/${id}`, {headers: {'Content-Type': 'application/json'}, data:null}),
+
+  cancelarAgendamento: (id: string) =>
+    api.delete(`/api/v1/agendamentos/${id}`, { headers: { 'Content-Type': 'application/json' }, data: null }),
 
   // Adicione este método ao apiService
-  criarUsuario: (userData: { nome: string; telefone: string; email: string; senha: string; cpf?: string; cnpj?: string }) => 
-  apiUsuarios.post('/api/v1/usuarios', userData),
-  
+  criarUsuario: (userData: { nome: string; telefone: string; email: string; senha: string; cpf?: string; cnpj?: string }) =>
+    apiUsuarios.post('/api/v1/usuarios', userData),
+
   // Add more API methods as needed...
+  buscarQuadras: (id: string) => apiQuadras.get(`/quadras/${id}`)
 }
 
 export default apiService
