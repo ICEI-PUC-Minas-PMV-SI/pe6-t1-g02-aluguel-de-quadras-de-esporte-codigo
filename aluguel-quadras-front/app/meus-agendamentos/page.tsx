@@ -17,6 +17,8 @@ import isoDateFormatter from '../shared/helpers/isoDateFormatter'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import ReagendarForm from './reagendarForm'
+import { prototype } from 'events'
+import { useToast } from '@/hooks/use-toast'
 
 // Mock data for scheduled courts (empty for demonstration)
 // const scheduledCourts = [
@@ -25,42 +27,42 @@ import ReagendarForm from './reagendarForm'
 //   { id: 3, courtName: 'Squash Court B', date: '2024-03-17', time: '18:00-19:00', location: 'Fitness Club' },
 // ]
 
-export default function CourtManagementWrapper() {
-
-  return (
-    <AuthProvider>
-      <CourtManagement></CourtManagement>
-    </AuthProvider>
-  )
-}
 
 
-
-function CourtManagement() {
+export default function CourtManagement() {
   const [agendamentos, setAgendamentos] = useState([])
   const [selectedCourt, setSelectedCourt] = useState(null)
-  const [loading, setLoading] = useState(true)
   const [quadras, setQuadras] = useState(new Map())
-  const user = useAuth().user
+  const {user} = useAuth()
   const router = useRouter()
+  const {toast} = useToast()
+
+  function handleUpdateAgendamento(id: string, agendamento: Partial<Agendamento>) {
+    let newAgendamentos: Agendamento[] = [...agendamentos]
+    for(let i=0; i< newAgendamentos.length; i++) {
+      if(newAgendamentos[i].idAgendamento === id) {
+        newAgendamentos[i] =  {...newAgendamentos[i], ...agendamento}
+      }
+    }
+    console.log(newAgendamentos)
+    setAgendamentos(newAgendamentos)
+    console.log(agendamentos)
+  }
 
   function cancelarAgendamento(id: string) {
     console.log("cancelando agendamento")
+
     apiService.cancelarAgendamento(id).then(r=> {
-      let newAgendamentos: Agendamento[] = [...agendamentos]
-      newAgendamentos.forEach(agendamento=> {
-        if(agendamento.idAgendamento === id) {
-          console.log("agendamento cancelado")
-        agendamento.status = "CANCELADO"
-      }})
-      setAgendamentos(newAgendamentos)
+      handleUpdateAgendamento(id, {status: "CANCELADO"})
+      toast({
+        title: "Sucesso",
+        description: "Agendamento cancelado com sucesso."
+    })
     })
   }
 
   useEffect(()=>{
-    console.log("chamando quadras")
     agendamentos.map((agendamento)=>{
-      console.log(agendamento)
       if(!quadras.get(agendamento.idQuadra)) {
         apiService.buscarQuadras(agendamento.idQuadra)
         .then(quadra => {
@@ -74,28 +76,28 @@ function CourtManagement() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (!user) {
+      console.log(user)
+      if (user === undefined) {
         router.push('/login')
-      } else {
+      } 
+      if(user) {
         apiService.getAgendamentosByUser(user.id).then(r => {
           setAgendamentos(r.data.agendamentos)
-          setLoading(false)
         })
-
       }
     }
-  }, [])
+  }, [user])
 
 
-  if (loading) {
+  if (!user) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>
   }
 
   return (
 
-    <AuthProvider>
+    <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div onLoad={()=> {initialize()}} className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">Minhas quadras agendadas</h1>
           <Card>
@@ -126,8 +128,8 @@ function CourtManagement() {
                     {agendamentos.map((agendamento) => (
                       <TableRow key={agendamento.idAgendamento}>
                         <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.nome || `-`}</TableCell>
-                        <TableCell>{isoDateFormatter.formatDate(agendamento.dataInicio)}</TableCell>
-                        <TableCell>{isoDateFormatter.formatTime(agendamento.dataInicio)+ " - " + isoDateFormatter.formatTime(agendamento.dataFim)}</TableCell>
+                        <TableCell>{isoDateFormatter.formatDate(agendamento.inicioAgendamento)}</TableCell>
+                        <TableCell>{isoDateFormatter.formatTime(agendamento.inicioAgendamento)+ " - " + isoDateFormatter.formatTime(agendamento.fimAgendamento)}</TableCell>
                         <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.localizacao || `-`}</TableCell>
                         <TableCell>
                           <Badge variant={agendamento.status === 'CANCELADO' ? "destructive" : "default"}>{agendamento.status}</Badge>
@@ -148,7 +150,7 @@ function CourtManagement() {
                                     <DialogHeader>
                                       <DialogTitle>Reagendar quadra</DialogTitle>
                                     </DialogHeader>
-                                      <ReagendarForm quadra={selectedCourt} agendamento={agendamento}>
+                                      <ReagendarForm quadra={selectedCourt} agendamento={agendamento} updateFunction={handleUpdateAgendamento}>
 
                                       </ReagendarForm>
                                   </DialogContent>
@@ -183,6 +185,6 @@ function CourtManagement() {
         </div>
       </div>
 
-    </AuthProvider>
+    </>
   )
 }

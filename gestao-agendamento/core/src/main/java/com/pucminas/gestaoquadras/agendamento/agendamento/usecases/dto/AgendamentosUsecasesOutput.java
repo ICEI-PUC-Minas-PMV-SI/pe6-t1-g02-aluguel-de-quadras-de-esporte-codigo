@@ -8,15 +8,15 @@ public record AgendamentosUsecasesOutput(
         String idAgendamento,
         String idQuadra,
         String idUsuario,
-        Instant dataInicio,
-        Instant dataFim,
+        Instant inicioAgendamento,
+        Instant fimAgendamento,
         String status
 ) {
 
     public static AgendamentosUsecasesOutput fromDomain(Agendamento agendamento) {
         return new AgendamentosUsecasesOutput(
                 agendamento.getId().getValue(),
-                agendamento.getQuadra().quadraId(),
+                agendamento.getQuadra(),
                 agendamento.getUsuario().id(),
                 agendamento.getInicioAgendamento(),
                 agendamento.getFimAgendamento(),

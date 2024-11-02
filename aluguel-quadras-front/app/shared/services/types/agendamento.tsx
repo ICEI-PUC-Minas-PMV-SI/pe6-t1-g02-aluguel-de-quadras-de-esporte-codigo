@@ -2,8 +2,8 @@ export default interface Agendamento {
     idAgendamento: string
     idQuadra: string
     idUsuario: string
-    dataInicio: string
-    dataFim: string
+    inicioAgendamento: string
+    fimAgendamento: string
     status: AgendamentoStatus
 }
 

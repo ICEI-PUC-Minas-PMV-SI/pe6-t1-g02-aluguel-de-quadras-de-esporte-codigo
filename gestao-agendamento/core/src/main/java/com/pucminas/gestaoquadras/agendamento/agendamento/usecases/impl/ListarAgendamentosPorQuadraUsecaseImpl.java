@@ -20,9 +20,8 @@ public class ListarAgendamentosPorQuadraUsecaseImpl implements ListarAgendamento
 
     @Override
     public ListarAgendamentosPorQuadraUsecaseOutput execute(ListarAgendamentosPorQuadraUsecaseInput input) {
-        final var quadra = new Quadra(input.id(), null, null, null, null);
         final var outputs = this.agendamentoGateway
-                .getAgendamentosByQuadra(quadra)
+                .getAgendamentosByQuadra(input.id())
                 .stream()
                 .map(AgendamentosUsecasesOutput::fromDomain)
                 .toList();

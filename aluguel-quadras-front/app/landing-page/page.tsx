@@ -8,7 +8,7 @@ import { Navbar } from "../shared/custom-components/navbar"
 
 export default function LandingPage() {
   return (
-    <AuthProvider>
+    <>
       <Navbar></Navbar>
       <div className="min-h-screen bg-white">
         <main>
@@ -69,7 +69,7 @@ export default function LandingPage() {
           </div>
         </footer>
       </div>
-    </AuthProvider>
+    </>
   )
 }
 

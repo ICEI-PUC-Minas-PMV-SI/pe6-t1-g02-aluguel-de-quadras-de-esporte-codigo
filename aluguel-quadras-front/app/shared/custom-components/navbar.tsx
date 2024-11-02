@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Calendar, ClipboardList, MapPin, UserCircle, LogIn, LogOut } from "lucide-react"
 import { useAuth } from '../auth/auth-context'
+import { useEffect } from 'react'
 
 export function Navbar() {
   const { user, logout } = useAuth()
@@ -12,7 +13,7 @@ export function Navbar() {
       <div className="flex justify-between h-16">
         <div className="flex">
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="text-xl font-bold text-gray-900">
+            <Link href="/landing-page" className="text-xl font-bold text-gray-900">
               Quaddra
             </Link>
           </div>

@@ -10,11 +10,15 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ptBR } from 'date-fns/locale'
 import apiService from "../shared/services/api-service";
+import Agendamento from "../shared/services/types/agendamento";
+import { useToast } from "@/hooks/use-toast";
+import { DialogClose } from "@radix-ui/react-dialog";
 
-export default function ReagendarForm(props: { quadra: any, agendamento: any }) {
-    const [dateOriginal, setDateOriginal] = useState(new Date(props.agendamento.dataInicio))
-    const [horaInicio, setHoraInicio] = useState(new Date(props.agendamento.dataInicio))
-    const [horaFim, setHoraFim] = useState(new Date(props.agendamento.dataFim))
+export default function ReagendarForm(props: { quadra: any, agendamento: any, updateFunction: (id: string, agendamento: Partial<Agendamento>) => {} }) {
+    const [dateOriginal, setDateOriginal] = useState(new Date(props.agendamento.inicioAgendamento))
+    const [horaInicio, setHoraInicio] = useState(new Date(props.agendamento.inicioAgendamento))
+    const [horaFim, setHoraFim] = useState(new Date(props.agendamento.fimAgendamento))
+    const {toast} = useToast()
 
     useEffect(() => {
         console.log(props)
@@ -31,13 +35,28 @@ export default function ReagendarForm(props: { quadra: any, agendamento: any }) 
         dataFim.setMinutes(horaFim.getMinutes());
         dataFim.setSeconds(horaFim.getSeconds());
 
-        apiService.reagendar(props.agendamento.idAgendamento, {dataInicio: dataInicio.toISOString(), dataFim: dataFim.toISOString()})
+        apiService
+            .reagendar(props.agendamento.idAgendamento, { inicioAgendamento: dataInicio.toISOString(), fimAgendamento: dataFim.toISOString() })
+            .then(() => {
+                props.updateFunction(
+                    props.agendamento.idAgendamento,
+                    {
+                        inicioAgendamento: dataInicio.toISOString(),
+                        fimAgendamento: dataFim.toISOString()
+                    }
+                );
+
+                toast({
+                    title: "Sucesso",
+                    description: "Reagendamento feito com sucesso."
+                })
+            })
     }
 
     return (
         <div className="py-4">
 
-            <div className="columns-2" style={{"display": "ruby"}}>
+            <div className="columns-2" style={{ "display": "ruby" }}>
                 <div>
                     <Label htmlFor='quadra'>Quadra</Label>
                     <Input id="quadra" disabled value={props.quadra?.nome}></Input>
@@ -71,27 +90,30 @@ export default function ReagendarForm(props: { quadra: any, agendamento: any }) 
                 <div>
 
 
-                <Label>Inicio do agendamento</Label>
-            <TimePicker
-                id="inicio"
-                date={horaInicio}
-                setDate={setHoraInicio}
-            ></TimePicker>
+                    <Label>Inicio do agendamento</Label>
+                    <TimePicker
+                        id="inicio"
+                        date={horaInicio}
+                        setDate={setHoraInicio}
+                    ></TimePicker>
 
                 </div>
                 <div>
 
-                <Label>Fim do agendamento</Label>
-            <TimePicker
-                id="fim"
-                date={horaFim}
-                setDate={setHoraFim}
-            ></TimePicker>
+                    <Label>Fim do agendamento</Label>
+                    <TimePicker
+                        id="fim"
+                        date={horaFim}
+                        setDate={setHoraFim}
+                    ></TimePicker>
 
                 </div>
             </div>
 
-            <Button onClick={()=>{reagendar()}}>Reagendar</Button>
+<DialogClose asChild>
+<Button onClick={() => { reagendar() }}>Reagendar</Button>
+</DialogClose>
+            
         </div>
     )
 }

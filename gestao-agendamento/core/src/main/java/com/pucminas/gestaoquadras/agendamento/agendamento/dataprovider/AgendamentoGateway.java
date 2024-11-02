@@ -12,8 +12,8 @@ public interface AgendamentoGateway {
     Agendamento save(Agendamento agendamento);
     Set<Agendamento> getAgendamentos();
     Set<Agendamento> getAgendamentosByUsuario(Usuario usuario);
-    Set<Agendamento> getAgendamentosByQuadra(Quadra quadra);
-    Set<String> getCountAgendamentosByQuadraEHorario(Quadra quadra, Instant inicioAgendamento, Instant fimAgendamento);
+    Set<Agendamento> getAgendamentosByQuadra(String quadraId);
+    Set<String> getCountAgendamentosByQuadraEHorario(String quadraId, Instant inicioAgendamento, Instant fimAgendamento);
 
     Agendamento getAgendamentoById(AgendamentoID agendamentoID);
 

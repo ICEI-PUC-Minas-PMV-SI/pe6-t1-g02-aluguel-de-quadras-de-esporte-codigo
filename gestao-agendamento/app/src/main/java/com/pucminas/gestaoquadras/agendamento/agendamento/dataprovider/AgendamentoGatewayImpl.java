@@ -50,17 +50,17 @@ public class AgendamentoGatewayImpl implements AgendamentoGateway {
     }
 
     @Override
-    public Set<Agendamento> getAgendamentosByQuadra(Quadra quadra) {
+    public Set<Agendamento> getAgendamentosByQuadra(String quadra) {
         return this
                 .repository
-                .findAgendamentosByQuadra(quadra.quadraId())
+                .findAgendamentosByQuadra(quadra)
                 .stream()
                 .map(AgendamentoMapper::toDomain)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<String> getCountAgendamentosByQuadraEHorario(Quadra quadra, Instant inicioAgendamento, Instant fimAgendamento) {
+    public Set<String> getCountAgendamentosByQuadraEHorario(String quadra, Instant inicioAgendamento, Instant fimAgendamento) {
         return new HashSet<>();
     }
 
