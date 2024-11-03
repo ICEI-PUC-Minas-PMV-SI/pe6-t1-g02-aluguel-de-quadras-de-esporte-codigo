@@ -105,7 +105,7 @@ export default function CourtManagement() {
               <CardTitle>Agendamentos ({agendamentos.length})</CardTitle>
               <Button className="bg-black text-white hover:bg-gray-800">
                 <PlusCircle className="mr-2 h-4 w-4" />
-                <Link href="/quadras">
+                <Link href="/catalogo">
                   Escolha uma quadra
                 </Link>
 
@@ -174,7 +174,7 @@ export default function CourtManagement() {
                   <div className="mt-6">
                     <Button className="bg-black text-white hover:bg-gray-800">
                       <PlusCircle className="mr-2 h-4 w-4" />
-                      <Link href="/quadras"> Escolha uma quadra </Link>
+                      <Link href="/catalogo"> Escolha uma quadra </Link>
                     </Button>
                   </div>
                 </div>

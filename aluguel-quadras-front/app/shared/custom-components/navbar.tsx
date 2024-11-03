@@ -34,7 +34,7 @@ export function Navbar() {
               )
             }
 
-            <NavLink href="/quadras" icon={<MapPin className="h-5 w-5" />}>
+            <NavLink href="/catalogo" icon={<MapPin className="h-5 w-5" />}>
               Quadras
             </NavLink>
           </div>
