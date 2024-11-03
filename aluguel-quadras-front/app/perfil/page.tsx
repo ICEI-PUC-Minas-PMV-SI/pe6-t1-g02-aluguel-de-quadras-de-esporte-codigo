@@ -36,7 +36,7 @@ export default function AlterarPerfil() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
+
     if (name === 'novaSenha' || name === 'confirmarNovaSenha') {
       if (name === 'novaSenha' && formData.confirmarNovaSenha && value !== formData.confirmarNovaSenha) {
         setPasswordError('As senhas não coincidem')
@@ -84,34 +84,29 @@ export default function AlterarPerfil() {
       nome: formData.nome ?? "",
     };
 
-    try {
-      const resposta = await apiService.editaUsuario(userData, user!!.id)
-      
-      
-      if (resposta.data) {
-        toast({
-          title: "Sucesso",
-          description: "Seu perfil foi atualizado com sucesso.",
-        })
-        // Limpar o formulário após o sucesso
-        setFormData({
-          nome: '',
-          telefone: '',
-          senhaAtual: '',
-          novaSenha: '',
-          confirmarNovaSenha: ''
-        })
-      } else {
-        throw new Error('Falha ao atualizar o perfil')
-      }
-    } catch (erro) {
-      console.error('Erro ao atualizar perfil:', erro)
+
+    apiService.editaUsuario(userData, user!!.id).then(r => {
       toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao atualizar seu perfil. Por favor, tente novamente.",
-        variant: "destructive",
+        title: "Sucesso",
+        description: "Seu perfil foi atualizado com sucesso.",
       })
-    }
+      // Limpar o formulário após o sucesso
+      setFormData({
+        nome: '',
+        telefone: '',
+        senhaAtual: '',
+        novaSenha: '',
+        confirmarNovaSenha: ''
+      })
+    })
+      .catch(e => {
+        console.error('Erro ao atualizar perfil:', e)
+        toast({
+          title: "Erro",
+          description: "Ocorreu um erro ao atualizar seu perfil. Por favor, tente novamente.",
+          variant: "destructive",
+        })
+      })
   }
 
   return (
@@ -134,7 +129,7 @@ export default function AlterarPerfil() {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="telefone">Telefone</Label>
               <Input
@@ -146,7 +141,7 @@ export default function AlterarPerfil() {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="novaSenha">Nova Senha</Label>
               <Input
@@ -157,7 +152,7 @@ export default function AlterarPerfil() {
                 onChange={handleInputChange}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmarNovaSenha">Confirmar Nova Senha</Label>
               <Input
