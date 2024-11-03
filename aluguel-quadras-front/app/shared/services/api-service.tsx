@@ -32,6 +32,16 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error)
 })
 
+apiUsuarios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`
+  }
+  return config
+}, (error) => {
+  return Promise.reject(error)
+})
+
 // Add a response interceptor to handle common errors
 api.interceptors.response.use(
   (response) => response,
@@ -65,13 +75,44 @@ api.interceptors.response.use(
   }
 )
 
+apiUsuarios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          // Handle unauthorized error (e.g., redirect to login)
+          console.error('Unauthorized access. Redirecting to login...')
+          // You might want to use a more sophisticated method to handle redirects
+          window.location.href = '/login'
+          break
+        case 403:
+          console.error('Forbidden access.')
+          break
+        case 404:
+          console.error('Resource not found.')
+          break
+        case 500:
+          console.error('Internal server error.')
+          break
+        default:
+          console.error('An error occurred:', error.response.data)
+      }
+    } else if (error.request) {
+      console.error('No response received:', error.request)
+    } else {
+      console.error('Error setting up request:', error.message)
+    }
+    return Promise.reject(error)
+  }
+)
+
+
+
 const apiService = {
 
   login: (email: string, password: string) =>
     api.post<LoginResponse>('/api/v1/login', { email, password }),
-
-  getUser: (id: string) =>
-    api.get(`/api/v1/usuarios/${id}`),
 
   getAgendamentosByUser: (idUsuario: string) =>
     api.get<{ agendamentos: Agendamento[] }>(`/api/v1/agendamentos/usuario/${idUsuario}`, { headers: { 'Content-Type': 'application/json' }, data: null }),
@@ -85,7 +126,12 @@ const apiService = {
   cancelarAgendamento: (id: string) =>
     api.delete(`/api/v1/agendamentos/${id}`, { headers: { 'Content-Type': 'application/json' }, data: null }),
 
-  // Adicione este método ao apiService
+  getUser: (id: string) =>
+    apiUsuarios.get(`/api/v1/usuarios/${id}`, { headers: { 'Content-Type': 'application/json' }, data: null }),
+
+  editaUsuario: (userData: { senha: string; telefone: string; nome: string}, id: string) =>
+    apiUsuarios.put(`/api/v1/usuarios/${id}`, userData) ,
+
   criarUsuario: (userData: { nome: string; telefone: string; email: string; senha: string; cpf?: string; cnpj?: string }) =>
     apiUsuarios.post('/api/v1/usuarios', userData),
 
