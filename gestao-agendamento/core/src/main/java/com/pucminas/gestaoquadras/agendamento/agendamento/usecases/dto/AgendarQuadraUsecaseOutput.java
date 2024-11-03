@@ -17,7 +17,7 @@ public record AgendarQuadraUsecaseOutput (
         return new AgendarQuadraUsecaseOutput(
                 agendamento.getId().getValue(),
                 agendamento.getStatus().name(),
-                agendamento.getQuadra().quadraId(),
+                agendamento.getQuadra(),
                 agendamento.getUsuario().id(),
                 agendamento.getInicioAgendamento(),
                 agendamento.getFimAgendamento()

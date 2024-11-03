@@ -13,12 +13,12 @@ import java.util.Objects;
 
 public class Agendamento extends Entity<AgendamentoID> {
     private AgendamentoStatus status;
-    private final Quadra quadra;
+    private final String quadra;
     private final Usuario usuario;
     private Instant inicioAgendamento;
     private Instant fimAgendamento;
 
-    private Agendamento(AgendamentoID id, AgendamentoStatus status, Quadra quadra, Usuario usuario, Instant inicioAgendamento, Instant fimAgendamento) {
+    private Agendamento(AgendamentoID id, AgendamentoStatus status, String quadra, Usuario usuario, Instant inicioAgendamento, Instant fimAgendamento) {
         this.id = id;
         this.status = status;
         this.quadra = quadra;
@@ -27,7 +27,7 @@ public class Agendamento extends Entity<AgendamentoID> {
         this.fimAgendamento = fimAgendamento;
     }
 
-    public static Agendamento newAgendamento(Quadra quadra, Usuario usuario, Instant inicioAgendamento, Instant fimAgendamento) {
+    public static Agendamento newAgendamento(String quadra, Usuario usuario, Instant inicioAgendamento, Instant fimAgendamento) {
         final var agendamento = new Agendamento(AgendamentoID.unique(), AgendamentoStatus.AGENDADO, quadra, usuario, inicioAgendamento, fimAgendamento);
         agendamento.validate();
         return agendamento;
@@ -37,7 +37,7 @@ public class Agendamento extends Entity<AgendamentoID> {
         final var agendamento = new Agendamento(
                 AgendamentoID.from(id),
                 AgendamentoStatus.valueOf(status),
-                new Quadra(quadraId, null, null, null, null),
+                quadraId,
                 new Usuario(usuarioid, null),
                 inicioAgendamento,
                 fimAgendamento
@@ -88,7 +88,7 @@ public class Agendamento extends Entity<AgendamentoID> {
         this.status = status;
     }
 
-    public Quadra getQuadra() {
+    public String getQuadra() {
         return quadra;
     }
 

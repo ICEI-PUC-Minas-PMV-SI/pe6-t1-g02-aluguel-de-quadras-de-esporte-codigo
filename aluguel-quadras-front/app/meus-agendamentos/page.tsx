@@ -12,6 +12,14 @@ import { AuthProvider, useAuth } from '../shared/auth/auth-context'
 import apiService from '../shared/services/api-service'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
+import Agendamento from '../shared/services/types/agendamento'
+import isoDateFormatter from '../shared/helpers/isoDateFormatter'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import ReagendarForm from './reagendarForm'
+import { prototype } from 'events'
+import { useToast } from '@/hooks/use-toast'
+
 // Mock data for scheduled courts (empty for demonstration)
 // const scheduledCourts = [
 //   { id: 1, courtName: 'Tennis Court A', date: '2024-03-15', time: '14:00-15:00', location: 'Main Complex' },
@@ -19,62 +27,77 @@ import { Badge } from '@/components/ui/badge'
 //   { id: 3, courtName: 'Squash Court B', date: '2024-03-17', time: '18:00-19:00', location: 'Fitness Club' },
 // ]
 
-export default function CourtManagementWrapper() {
-
-  return (
-    <AuthProvider>
-      <CourtManagement></CourtManagement>
-    </AuthProvider>
-  )
-}
 
 
-
-function CourtManagement() {
+export default function CourtManagement() {
   const [agendamentos, setAgendamentos] = useState([])
   const [selectedCourt, setSelectedCourt] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const user = useAuth().user
+  const [quadras, setQuadras] = useState(new Map())
+  const {user} = useAuth()
   const router = useRouter()
+  const {toast} = useToast()
+
+  function handleUpdateAgendamento(id: string, agendamento: Partial<Agendamento>) {
+    let newAgendamentos: Agendamento[] = [...agendamentos]
+    for(let i=0; i< newAgendamentos.length; i++) {
+      if(newAgendamentos[i].idAgendamento === id) {
+        newAgendamentos[i] =  {...newAgendamentos[i], ...agendamento}
+      }
+    }
+    console.log(newAgendamentos)
+    setAgendamentos(newAgendamentos)
+    console.log(agendamentos)
+  }
 
   function cancelarAgendamento(id: string) {
-    
+    console.log("cancelando agendamento")
+
     apiService.cancelarAgendamento(id).then(r=> {
-      console.log("cancelando agendamento")
-      let newAgendamentos = [...agendamentos]
-      newAgendamentos.forEach(agendamento=> {
-        if(agendamento.idAgendamento === id) {
-          console.log("agendamento encontrado")
-        agendamento.status = "CANCELADO"
-      }})
-      setAgendamentos(newAgendamentos)
+      handleUpdateAgendamento(id, {status: "CANCELADO"})
+      toast({
+        title: "Sucesso",
+        description: "Agendamento cancelado com sucesso."
+    })
     })
   }
 
+  useEffect(()=>{
+    agendamentos.map((agendamento)=>{
+      if(!quadras.get(agendamento.idQuadra)) {
+        apiService.buscarQuadras(agendamento.idQuadra)
+        .then(quadra => {
+          quadras.set(quadra.data.id, quadra.data);
+          console.log(quadras)
+        })
+      }
+
+    })
+  }, [agendamentos])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (!user) {
+      console.log(user)
+      if (user === undefined) {
         router.push('/login')
-      } else {
+      } 
+      if(user) {
         apiService.getAgendamentosByUser(user.id).then(r => {
           setAgendamentos(r.data.agendamentos)
-          setLoading(false)
         })
-
       }
     }
-  }, [])
+  }, [user])
 
 
-  if (loading) {
+  if (!user) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>
   }
 
   return (
 
-    <AuthProvider>
+    <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div onLoad={()=> {initialize()}} className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">Minhas quadras agendadas</h1>
           <Card>
@@ -82,7 +105,7 @@ function CourtManagement() {
               <CardTitle>Agendamentos ({agendamentos.length})</CardTitle>
               <Button className="bg-black text-white hover:bg-gray-800">
                 <PlusCircle className="mr-2 h-4 w-4" />
-                <Link href="/quadras">
+                <Link href="/catalogo">
                   Escolha uma quadra
                 </Link>
 
@@ -93,21 +116,21 @@ function CourtManagement() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {/* <TableHead>Court</TableHead> */}
+                      <TableHead>Quadra</TableHead>
                       <TableHead>Data</TableHead>
-                      <TableHead>Horario</TableHead>
-                      {/* <TableHead>Location</TableHead> */}
+                      <TableHead>Horário</TableHead>
+                      <TableHead>Local</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Acoes</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {agendamentos.map((agendamento) => (
                       <TableRow key={agendamento.idAgendamento}>
-                        {/* <TableCell className="font-medium">{agendamento.courtName}</TableCell> */}
-                        <TableCell>{agendamento.dataInicio}</TableCell>
-                        <TableCell>{agendamento.dataFim}</TableCell>
-                        {/* <TableCell>{agendamento.location}</TableCell> */}
+                        <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.nome || `-`}</TableCell>
+                        <TableCell>{isoDateFormatter.formatDate(agendamento.inicioAgendamento)}</TableCell>
+                        <TableCell>{isoDateFormatter.formatTime(agendamento.inicioAgendamento)+ " - " + isoDateFormatter.formatTime(agendamento.fimAgendamento)}</TableCell>
+                        <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.localizacao || `-`}</TableCell>
                         <TableCell>
                           <Badge variant={agendamento.status === 'CANCELADO' ? "destructive" : "default"}>{agendamento.status}</Badge>
                         </TableCell>
@@ -117,18 +140,19 @@ function CourtManagement() {
                               <div className="flex space-x-2">
                                 <Dialog>
                                   <DialogTrigger asChild>
-                                    <Button variant="outline" size="icon" onClick={() => setSelectedCourt(court)}>
+                                    <Button variant="outline" size="icon" onClick={() => 
+                                       setSelectedCourt(quadras.get(parseInt(agendamento.idQuadra)))
+                                      }>
                                       <Edit className="h-4 w-4" />
                                     </Button>
                                   </DialogTrigger>
                                   <DialogContent>
                                     <DialogHeader>
-                                      <DialogTitle>Edit Reservation</DialogTitle>
+                                      <DialogTitle>Reagendar quadra</DialogTitle>
                                     </DialogHeader>
-                                    <div className="py-4">
-                                      <p>Editing functionality would go here.</p>
-                                      <p>Court: {selectedCourt?.courtName}</p>
-                                    </div>
+                                      <ReagendarForm quadra={selectedCourt} agendamento={agendamento} updateFunction={handleUpdateAgendamento}>
+
+                                      </ReagendarForm>
                                   </DialogContent>
                                 </Dialog>
                                 <Button variant="destructive" size="icon" onClick={()=>cancelarAgendamento(agendamento.idAgendamento)}>
@@ -150,7 +174,7 @@ function CourtManagement() {
                   <div className="mt-6">
                     <Button className="bg-black text-white hover:bg-gray-800">
                       <PlusCircle className="mr-2 h-4 w-4" />
-                      <Link href="/quadras"> Escolha uma quadra </Link>
+                      <Link href="/catalogo"> Escolha uma quadra </Link>
                     </Button>
                   </div>
                 </div>
@@ -161,6 +185,6 @@ function CourtManagement() {
         </div>
       </div>
 
-    </AuthProvider>
+    </>
   )
 }

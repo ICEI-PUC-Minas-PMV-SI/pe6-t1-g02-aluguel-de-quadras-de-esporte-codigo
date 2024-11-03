@@ -3,6 +3,7 @@ package com.pucminas.gestaoquadras.login.entrypoint;
 import com.pucminas.gestaoquadras.configuration.auth.JwtService;
 import com.pucminas.gestaoquadras.login.entrypoint.request.LoginRequest;
 import com.pucminas.gestaoquadras.login.entrypoint.response.LoginResponse;
+import com.pucminas.gestaoquadras.login.entrypoint.response.UserDto;
 import com.pucminas.gestaoquadras.usuarios.dataprovider.UsuarioJpaEntity;
 import com.pucminas.gestaoquadras.usuarios.dataprovider.UsuarioMySQLRepository;
 import jakarta.inject.Inject;
@@ -32,7 +33,7 @@ public class LoginRestController implements LoginRestEntrypoint {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.senha()));
         UsuarioJpaEntity authenticatedUser = userRepository.getUserByEmail(request.email()).orElseThrow();
         String jwtToken = jwtService.generateToken(authenticatedUser);
-        final var response = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+        final var response = new LoginResponse(jwtToken, jwtService.getExpirationTime(), UserDto.from(authenticatedUser));
         return ResponseEntity.ok(response);
     }
 }

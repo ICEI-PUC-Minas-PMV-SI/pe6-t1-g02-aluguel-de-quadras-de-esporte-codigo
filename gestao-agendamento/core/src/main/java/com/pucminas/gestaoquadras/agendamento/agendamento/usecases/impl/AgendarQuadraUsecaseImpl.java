@@ -34,10 +34,10 @@ public class AgendarQuadraUsecaseImpl implements AgendarQuadraUsecase {
 
     @Override
     public AgendarQuadraUsecaseOutput execute(AgendarQuadraUsecaseInput input) {
-        final var quadra = quadraGateway.getQuadraById(input.idQuadra());
-        if(Objects.isNull(quadra)) {
-            throw new NotFoundException("A quadra informada nao foi encontrada.");
-        }
+//        final var quadra = quadraGateway.getQuadraById(input.idQuadra());
+//        if(Objects.isNull(quadra)) {
+//            throw new NotFoundException("A quadra informada nao foi encontrada.");
+//        }
 
         final var usuario = usuarioGateway.getUsuarioById(input.idUsuario());
         if(Objects.isNull(usuario)) {
@@ -47,13 +47,13 @@ public class AgendarQuadraUsecaseImpl implements AgendarQuadraUsecase {
             throw new AgendamentoException("O usuario informado nao e pessoa fisica.");
         }
 
-        final var agendamentosExistentes = agendamentoGateway.getCountAgendamentosByQuadraEHorario(quadra, input.inicioAgendamento(), input.fimAgendamento());
+        final var agendamentosExistentes = agendamentoGateway.getCountAgendamentosByQuadraEHorario(input.idQuadra(), input.inicioAgendamento(), input.fimAgendamento());
 
         if(!agendamentosExistentes.isEmpty()) {
             throw new AgendamentoException("A quadra ja esta agendada no horario desejado.");
         }
 
-        final var agendamento = Agendamento.newAgendamento(quadra, usuario, input.inicioAgendamento(), input.fimAgendamento());
+        final var agendamento = Agendamento.newAgendamento(input.idQuadra(), usuario, input.inicioAgendamento(), input.fimAgendamento());
 
         return AgendarQuadraUsecaseOutput.from(agendamentoGateway.save(agendamento));
     }

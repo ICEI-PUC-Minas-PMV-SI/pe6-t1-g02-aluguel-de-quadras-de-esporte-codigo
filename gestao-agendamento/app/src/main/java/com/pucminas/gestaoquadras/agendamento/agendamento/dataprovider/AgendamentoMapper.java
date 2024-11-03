@@ -19,7 +19,7 @@ public class AgendamentoMapper {
         return new AgendamentoJpaEntity(
                 domain.getId().getValue(),
                 domain.getStatus().name(),
-                domain.getQuadra().quadraId(),
+                domain.getQuadra(),
                 domain.getUsuario().id(),
                 domain.getInicioAgendamento(),
                 domain.getFimAgendamento()
