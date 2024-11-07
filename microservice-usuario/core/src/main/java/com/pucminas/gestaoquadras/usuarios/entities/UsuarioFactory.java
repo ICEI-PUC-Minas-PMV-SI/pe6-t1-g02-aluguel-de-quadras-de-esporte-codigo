@@ -40,14 +40,14 @@ public class UsuarioFactory {
             final CPF cpf,
             final CNPJ cnpj
     ) {
-        if (Objects.isNull(cpf) && Objects.isNull(cnpj)) {
+        if (Objects.isNull(cpf.getValue()) && Objects.isNull(cnpj.getValue())) {
             throw new IllegalArgumentException("CPF ou CNPJ deve ser informados");
         }
 
-        if(cpf != null && cpf.getValue().length() == 11) {
+        if(cpf.getValue() != null && cpf.getValue().length() == 11) {
             return Locatario.newLocatario(cpf, senha, email, telefone, nome);
         }
-        if(cnpj != null && cnpj.getValue().length() == 14) {
+        if(cnpj.getValue() != null && cnpj.getValue().length() == 14) {
             return Locador.newLocador(cnpj, senha, email, telefone, nome);
         }
 
