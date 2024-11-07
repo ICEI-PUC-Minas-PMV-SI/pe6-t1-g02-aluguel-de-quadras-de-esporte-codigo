@@ -18,6 +18,7 @@ import com.pucminas.gestaoquadras.usuarios.usecases.create.dto.UpdateUsuarioCase
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,7 +73,7 @@ public class UsuarioRestController implements UsuarioRestEntrypoint {
 
         final var updateUsecaseInput = new UpdateUsuarioCaseInput(
                 id,
-                Senha.of(body.senha()),
+                Senha.of(passwordEncoder.encode(body.senha())),
                 body.telefone(),
                 body.nome()
         );

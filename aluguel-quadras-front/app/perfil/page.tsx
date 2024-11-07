@@ -16,7 +16,6 @@ export default function AlterarPerfil() {
   const [formData, setFormData] = useState({
     nome: user?.nome,
     telefone: user?.telefone,
-    senhaAtual: '',
     novaSenha: '',
     confirmarNovaSenha: ''
   })
@@ -79,7 +78,7 @@ export default function AlterarPerfil() {
     }
 
     const userData = {
-      senha: formData.senhaAtual,
+      senha: formData.novaSenha,
       telefone: formData.telefone ?? "",
       nome: formData.nome ?? "",
     };
