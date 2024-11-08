@@ -55,12 +55,12 @@ public class AgendamentoRestController implements AgendamentoRestEndpoint {
     @Override
     public ResponseEntity<AgendarQuadraResponse> agendarQuadra(AgendarQuadraRequest request, Authentication auth) {
         final var principal = (User) auth.getPrincipal();
-        if (!principal.id().equals(request.usuarioId()) && !principal.authorities().contains("ROLE_ADMIN")) {
+        if (!principal.id().equals(request.idUsuario()) && !principal.authorities().contains("ROLE_ADMIN")) {
             throw new ForbiddenException("Usuário não autorizado");
         }
 
         final var usecaseOutput = agendarQuadraUsecase.execute(
-                new AgendarQuadraUsecaseInput(request.usuarioId(), request.quadraId(), request.inicioAgendamento(), request.fimAgendamento())
+                new AgendarQuadraUsecaseInput(request.idUsuario(), request.idQuadra(), request.inicioAgendamento(), request.fimAgendamento())
         );
 
         final var response = new AgendarQuadraResponse(
