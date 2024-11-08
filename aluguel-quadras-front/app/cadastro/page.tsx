@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import apiService from "@/app/shared/services/api-service"
+import { useToast } from "@/hooks/use-toast"
 
 export default function UserRegistration() {
   const router = useRouter()
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -107,6 +109,11 @@ export default function UserRegistration() {
       router.push('/login');
     } catch (error) {
       console.error('Erro ao enviar registro:', error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao cadastrar sua conta. Por favor, tente novamente.",
+        variant: "destructive",
+      })
     }
   };
 
