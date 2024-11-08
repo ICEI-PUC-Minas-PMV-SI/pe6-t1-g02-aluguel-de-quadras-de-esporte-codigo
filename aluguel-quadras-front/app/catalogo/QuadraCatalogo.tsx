@@ -6,16 +6,10 @@ import { Navbar } from "../shared/custom-components/navbar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import AgendarForm from './agendarForm';
 import { useAuth } from '../shared/auth/auth-context';
+import apiService from '../shared/services/api-service';
 
 export default function QuadraCatalogo() {
-  const [quadras] = useState([
-    { id: 1, nome: 'Quadra de Futebol', localizacao: 'A1', tipo: 'Futebol', precoPorHora: 100, imagem: '/images/quadra1.jpg' },
-    { id: 2, nome: 'Quadra Fechada', localizacao: 'A3', tipo: 'Basquete', precoPorHora: 80, imagem: '/images/quadra2.jpg' },
-    { id: 3, nome: 'Quadra de Basquete', localizacao: 'Bairro Norte', tipo: 'Vôlei', precoPorHora: 90, imagem: '/images/quadra3.jpg' },
-    { id: 4, nome: 'Quadra de Areia', localizacao: 'Bairro Leste', tipo: 'Tênis', precoPorHora: 120, imagem: '/images/quadra4.jpg' },
-    { id: 5, nome: 'Quadra de Tênis', localizacao: 'Bairro Oeste', tipo: 'Futsal', precoPorHora: 85, imagem: '/images/quadra5.jpg' },
-    { id: 6, nome: 'Quadra Aberta', localizacao: 'Praia Central', tipo: 'Beach Tennis', precoPorHora: 110, imagem: '/images/quadra6.jpg' },
-  ]);
+  const [quadras] = useState(apiService.buscarQuadras());
   const {user} = useAuth()
 
   return (

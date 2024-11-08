@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input'
 import ReagendarForm from './reagendarForm'
 import { prototype } from 'events'
 import { useToast } from '@/hooks/use-toast'
+import { isThisSecond } from 'date-fns'
 
 // Mock data for scheduled courts (empty for demonstration)
 // const scheduledCourts = [
@@ -62,17 +63,15 @@ export default function CourtManagement() {
   }
 
   useEffect(()=>{
-    agendamentos.map((agendamento)=>{
-      if(!quadras.get(agendamento.idQuadra)) {
-        apiService.buscarQuadras(agendamento.idQuadra)
-        .then(quadra => {
-          quadras.set(quadra.data.id, quadra.data);
-          console.log(quadras)
-        })
-      }
-
+    const listQuadras = apiService.buscarQuadras()
+    const mapQuadras = new Map()
+    listQuadras
+    .forEach((q)=>{
+      mapQuadras.set(q.id, q)
     })
-  }, [agendamentos])
+
+    setQuadras(mapQuadras)
+  }, [])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -127,10 +126,10 @@ export default function CourtManagement() {
                   <TableBody>
                     {agendamentos.map((agendamento) => (
                       <TableRow key={agendamento.idAgendamento}>
-                        <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.nome || `-`}</TableCell>
+                        <TableCell className="font-medium">{quadras.get(agendamento.idQuadra)?.nome || `-`}</TableCell>
                         <TableCell>{isoDateFormatter.formatDate(agendamento.inicioAgendamento)}</TableCell>
                         <TableCell>{isoDateFormatter.formatTime(agendamento.inicioAgendamento)+ " - " + isoDateFormatter.formatTime(agendamento.fimAgendamento)}</TableCell>
-                        <TableCell className="font-medium">{quadras.get(parseInt(agendamento.idQuadra))?.localizacao || `-`}</TableCell>
+                        <TableCell className="font-medium">{quadras.get(agendamento.idQuadra)?.localizacao || `-`}</TableCell>
                         <TableCell>
                           <Badge variant={agendamento.status === 'CANCELADO' ? "destructive" : "default"}>{agendamento.status}</Badge>
                         </TableCell>
@@ -141,7 +140,7 @@ export default function CourtManagement() {
                                 <Dialog>
                                   <DialogTrigger asChild>
                                     <Button variant="outline" size="icon" onClick={() => 
-                                       setSelectedCourt(quadras.get(parseInt(agendamento.idQuadra)))
+                                       setSelectedCourt(quadras.get(agendamento.idQuadra))
                                       }>
                                       <Edit className="h-4 w-4" />
                                     </Button>
