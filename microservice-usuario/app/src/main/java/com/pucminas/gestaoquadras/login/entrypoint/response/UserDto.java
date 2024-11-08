@@ -7,7 +7,8 @@ public record UserDto(
         String cpf,
         String cnpj,
         String nome,
-        String email
+        String email,
+        String telefone
 ) {
 
     public static UserDto from(UsuarioJpaEntity jpa) {
@@ -16,7 +17,8 @@ public record UserDto(
                 jpa.getCpf(),
                 jpa.getCnpj(),
                 jpa.getNome(),
-                jpa.getEmail()
+                jpa.getEmail(),
+                jpa.getTelefone()
         );
     }
 }

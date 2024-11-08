@@ -3,10 +3,12 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, Users } from "lucide-react"
-import { AuthProvider } from "../shared/auth/auth-context"
+import { useAuth } from '../shared/auth/auth-context'
 import { Navbar } from "../shared/custom-components/navbar"
 
 export default function LandingPage() {
+  const { user } = useAuth()
+
   return (
     <>
       <Navbar></Navbar>
@@ -15,14 +17,28 @@ export default function LandingPage() {
           <section className="py-20 sm:py-32">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
-                Simplifique o gerenciamento de suas quadras
+                Simplifique o gerenciamento das suas quadras esportivas de maneira eficiente e descomplicada.
               </h2>
               <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Gerencie e alugue quadras esportivas. A única solução necessária para quadras modernas e entusiastas do esporte.
+                Administre e alugue suas quadras com facilidade. A solução completa e ideal para quadras modernas e apaixonados por esportes.
               </p>
-              <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800">
-                <Link href="/login">Comece agora</Link>
-              </Button>
+              <div>
+                  {
+                    user ? (
+                      <>
+                      <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800">
+                        <Link href="/meus-agendamentos">Comece agora</Link>
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                      <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800">
+                        <Link href="/login">Comece agora</Link>
+                        </Button>
+                      </>
+                    )
+                  }
+              </div>
             </div>
           </section>
 
@@ -53,7 +69,7 @@ export default function LandingPage() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">Sobre a Quaddra</h2>
               <p className="text-xl text-center max-w-3xl mx-auto text-gray-600 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Hic a aut voluptas nemo consectetur esse suscipit veritatis tempore eius ea vitae quibusdam sunt excepturi neque quisquam iusto eos, et facere?
+                A Quaddra é uma plataforma inovadora dedicada ao gerenciamento e aluguel de quadras esportivas. Oferecemos uma solução moderna e eficiente para proprietários de quadras que desejam otimizar suas operações e atrair mais entusiastas do esporte. Com a Quaddra, a administração e o agendamento se tornam práticos, proporcionando uma experiência ágil e segura tanto para gestores quanto para usuários.
               </p>
             </div>
           </section>

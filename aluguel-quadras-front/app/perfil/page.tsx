@@ -9,10 +9,12 @@ import { Toaster } from "@/components/ui/toaster"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import apiService from "app/shared/services/api-service"
 import { AuthProvider, useAuth } from '../shared/auth/auth-context'
+import { useRouter } from 'next/navigation'
 
 export default function AlterarPerfil() {
   const user = useAuth().user
   const { toast } = useToast()
+  const router = useRouter()
   const [formData, setFormData] = useState({
     nome: user?.nome,
     telefone: user?.telefone,
@@ -68,6 +70,15 @@ export default function AlterarPerfil() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (!formData.nome || !formData.telefone || !formData.novaSenha || !formData.confirmarNovaSenha) {
+      toast({
+        title: "Erro",
+        description: "Todos os campos são obrigatórios",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (passwordError) {
       toast({
         title: "Erro",
@@ -97,6 +108,7 @@ export default function AlterarPerfil() {
         novaSenha: '',
         confirmarNovaSenha: ''
       })
+      router.push('/landing-page');
     })
       .catch(e => {
         console.error('Erro ao atualizar perfil:', e)
@@ -149,6 +161,7 @@ export default function AlterarPerfil() {
                 type="password"
                 value={formData.novaSenha}
                 onChange={handleInputChange}
+                required
               />
             </div>
 
@@ -160,6 +173,7 @@ export default function AlterarPerfil() {
                 type="password"
                 value={formData.confirmarNovaSenha}
                 onChange={handleInputChange}
+                required
               />
               {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
             </div>

@@ -12,6 +12,7 @@ export default function QuadraCatalogo() {
   const [quadras] = useState(apiService.buscarQuadras());
   const {user} = useAuth()
 
+
   return (
     <>
       <Navbar />
