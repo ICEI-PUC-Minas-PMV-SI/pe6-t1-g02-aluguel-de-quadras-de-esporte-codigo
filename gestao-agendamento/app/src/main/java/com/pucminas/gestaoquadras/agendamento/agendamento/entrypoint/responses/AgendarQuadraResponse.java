@@ -5,8 +5,8 @@ import java.time.Instant;
 public record AgendarQuadraResponse(
         String id,
         String status,
-        String quadraId,
-        String usuarioid,
+        String idQuadra,
+        String idUsuario,
         Instant inicioAgendamento,
         Instant fimAgendamento
 ) {

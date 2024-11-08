@@ -13,18 +13,20 @@ import apiService from "../shared/services/api-service";
 import Agendamento from "../shared/services/types/agendamento";
 import { useToast } from "@/hooks/use-toast";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useAuth } from "../shared/auth/auth-context";
 
-export default function ReagendarForm(props: { quadra: any, agendamento: any, updateFunction: (id: string, agendamento: Partial<Agendamento>) => {} }) {
-    const [dateOriginal, setDateOriginal] = useState(new Date(props.agendamento.inicioAgendamento))
-    const [horaInicio, setHoraInicio] = useState(new Date(props.agendamento.inicioAgendamento))
-    const [horaFim, setHoraFim] = useState(new Date(props.agendamento.fimAgendamento))
+export default function AgendarForm(props: { quadra: any }) {
+    const [dateOriginal, setDateOriginal] = useState(new Date())
+    const [horaInicio, setHoraInicio] = useState(new Date())
+    const [horaFim, setHoraFim] = useState(new Date())
     const { toast } = useToast()
+    const { user } = useAuth()
 
     useEffect(() => {
         console.log(props)
     }, [])
 
-    function reagendar() {
+    function agendar() {
         const dataInicio = new Date(dateOriginal);
         dataInicio.setHours(horaInicio.getHours());
         dataInicio.setMinutes(horaInicio.getMinutes());
@@ -36,19 +38,12 @@ export default function ReagendarForm(props: { quadra: any, agendamento: any, up
         dataFim.setSeconds(horaFim.getSeconds());
 
         apiService
-            .reagendar(props.agendamento.idAgendamento, { inicioAgendamento: dataInicio.toISOString(), fimAgendamento: dataFim.toISOString() })
+            .criarAgendamento({ inicioAgendamento: dataInicio.toISOString(), fimAgendamento: dataFim.toISOString(), idQuadra: props.quadra?.id, idUsuario: user!.id })
             .then(() => {
-                props.updateFunction(
-                    props.agendamento.idAgendamento,
-                    {
-                        inicioAgendamento: dataInicio.toISOString(),
-                        fimAgendamento: dataFim.toISOString()
-                    }
-                );
 
                 toast({
                     title: "Sucesso",
-                    description: "Reagendamento feito com sucesso."
+                    description: "Agendamento feito com sucesso."
                 })
             })
     }
@@ -112,7 +107,7 @@ export default function ReagendarForm(props: { quadra: any, agendamento: any, up
             </div>
 
             <DialogClose asChild>
-                <Button onClick={() => { reagendar() }}>Reagendar</Button>
+                <Button onClick={agendar}>Agendar</Button>
             </DialogClose>
 
         </div>

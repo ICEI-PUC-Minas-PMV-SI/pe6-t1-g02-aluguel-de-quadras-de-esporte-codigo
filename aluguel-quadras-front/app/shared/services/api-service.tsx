@@ -117,8 +117,8 @@ const apiService = {
   getAgendamentosByUser: (idUsuario: string) =>
     api.get<{ agendamentos: Agendamento[] }>(`/api/v1/agendamentos/usuario/${idUsuario}`, { headers: { 'Content-Type': 'application/json' }, data: null }),
 
-  criarAgendamento: (agendamento: Omit<Agendamento, 'id'>) =>
-    api.post<Agendamento>('/api/v1/agendamentos/', agendamento),
+  criarAgendamento: (agendamento: Partial<Agendamento>) =>
+    api.post<Agendamento>('/api/v1/agendamentos', agendamento, {headers: { 'Content-Type': 'application/json'}}),
 
   reagendar: (id: string, reservation: Partial<Agendamento>) =>
     api.put<Agendamento>(`/api/v1/agendamentos/${id}`, reservation),
