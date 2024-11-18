@@ -7,7 +7,12 @@ import {
     TouchableOpacity
 } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+
 export default function Login() {
+
+    const navigation = useNavigation();
+
     return (
         <View style={styles.container}>
 
@@ -29,11 +34,17 @@ export default function Login() {
                     style={styles.input}
                 />
 
-                <TouchableOpacity style={styles.buttonAcessar}>
+                <TouchableOpacity 
+                style={styles.buttonAcessar}
+                onPress={() => navigation.navigate("Home")}
+                >
                     <Text style={styles.buttonTextAcessar}>Acessar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.buttonCadastro}>
+                <TouchableOpacity 
+                style={styles.buttonCadastro}
+                onPress={() => navigation.navigate("Cadastro")}
+                >
                     <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
                 </TouchableOpacity>
             </View>
