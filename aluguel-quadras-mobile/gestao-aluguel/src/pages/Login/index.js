@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -13,6 +13,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const schema = yup.object({
     email: yup.string().email("E-mail inválido").required("Informe seu e-mail"),
     password: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha")
@@ -26,8 +28,37 @@ export default function Login() {
         resolver: yupResolver(schema)
     })
 
-    function handleLogin(data) {
-        console.log(data);
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async (data) => {
+        setLoading(true);
+        const loginData = {
+            email: data.email,
+            senha: data.password
+        }
+
+        try {
+            const response = await fetch('http://10.0.2.2:8080/api/v1/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                await AsyncStorage.setItem('userToken', result.token); // Salva o token
+                navigation.navigate('Home');
+            } else {
+                alert('Credenciais inválidas');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Erro! Não foi possível se conectar ao servidor.');
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -76,8 +107,9 @@ export default function Login() {
                 <TouchableOpacity
                     style={styles.buttonAcessar}
                     onPress={handleSubmit(handleLogin)}
+                    disabled={loading}
                 >
-                    <Text style={styles.buttonTextAcessar}>Acessar</Text>
+                    <Text style={styles.buttonTextAcessar}>{loading ? 'Carregando...' : 'Acessar'}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
