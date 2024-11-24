@@ -9,9 +9,26 @@ import {
 
 import { useNavigation } from '@react-navigation/native';
 
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object({
+    email: yup.string().email("E-mail inválido").required("Informe seu e-mail"),
+    password: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha")
+})
+
 export default function Login() {
 
     const navigation = useNavigation();
+
+    const { control, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema)
+    })
+
+    function handleLogin(data) {
+        console.log(data);
+    }
 
     return (
         <View style={styles.container}>
@@ -23,27 +40,49 @@ export default function Login() {
             <View style={styles.containerForm}>
 
                 <Text style={styles.title}>E-mail</Text>
-                <TextInput
-                    placeholder="Digite seu e-mail"
-                    style={styles.input}
-                />
 
-                <Text style={styles.title}>Senha</Text>
-                <TextInput
-                    placeholder="Digite sua senha"
-                    style={styles.input}
+                <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            placeholder="Digite seu e-mail"
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            value={value}
+                            style={styles.input}
+                        />
+                    )}
                 />
+                {errors.email && <Text style={styles.labelError}>{errors.email?.message}</Text>}
 
-                <TouchableOpacity 
-                style={styles.buttonAcessar}
-                onPress={() => navigation.navigate("Home")}
+
+                <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            placeholder="Digite sua senha"
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            value={value}
+                            style={styles.input}
+                            secureTextEntry={true}
+                        />
+                    )}
+                />
+                {errors.password && <Text style={styles.labelError}>{errors.password?.message}</Text>}
+
+                <TouchableOpacity
+                    style={styles.buttonAcessar}
+                    onPress={handleSubmit(handleLogin)}
                 >
                     <Text style={styles.buttonTextAcessar}>Acessar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity 
-                style={styles.buttonCadastro}
-                onPress={() => navigation.navigate("Cadastro")}
+                <TouchableOpacity
+                    style={styles.buttonCadastro}
+                    onPress={() => navigation.navigate("Cadastro")}
                 >
                     <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
                 </TouchableOpacity>
@@ -59,7 +98,7 @@ const styles = StyleSheet.create({
     },
     containerHeader: {
         marginTop: '14%',
-        marginBottom:'8%',
+        marginBottom: '8%',
         paddingStart: '5%'
     },
     message: {
@@ -81,13 +120,13 @@ const styles = StyleSheet.create({
         color: '#FFF'
     },
     input: {
-      borderBottomWidth: 1,
-      backgroundColor: '#FFF',
-      color: '#000',
-      marginTop: 12,
-      borderRadius: 8,
-      height: 56,
-      fontSize: 16
+        borderBottomWidth: 1,
+        backgroundColor: '#FFF',
+        color: '#000',
+        marginTop: 12,
+        borderRadius: 8,
+        height: 56,
+        fontSize: 16
     },
     buttonAcessar: {
         backgroundColor: '#FF5722',
@@ -99,12 +138,12 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonTextAcessar: {
-        color:'#FFFFFF',
+        color: '#FFFFFF',
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center'
     },
-    buttonCadastro : {
+    buttonCadastro: {
         backgroundColor: '#FFF',
         width: '100%',
         borderRadius: 8,
@@ -119,4 +158,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold'
     },
+    labelError: {
+        alignSelf: 'flex-start',
+        color: '#ff375b',
+        marginBottom: 8,
+    }
 })

@@ -18,7 +18,6 @@ export default function OnBoarding() {
 
             <View style={styles.containerLogo}>
                 <Image
-
                     source={require('../../assets/logo.png')}
                     style={{ width: '100%' }}
                     resizeMode="contain"
@@ -30,8 +29,8 @@ export default function OnBoarding() {
                 <Text style={styles.text}>Faça login para começar</Text>
 
                 <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate("Login")}
+                    style={styles.button}
+                    onPress={() => navigation.navigate("Login")}
                 >
                     <Text style={styles.textButton}>Acessar</Text>
                 </TouchableOpacity>
