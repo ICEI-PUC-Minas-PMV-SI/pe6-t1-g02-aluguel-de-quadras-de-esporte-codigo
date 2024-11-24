@@ -4,15 +4,17 @@ import OnBoarding from '../pages/OnBoarding'
 import Login from '../pages/Login'
 import Home from '../pages/Home'
 import Cadastro from '../pages/Cadastro'
-
+import Agendamentos from '../pages/Agendamentos'
+import { Provider } from 'react-native-paper'
 const Stack = createNativeStackNavigator();
 
 export default function Routes() {
     return (
+      <Provider>
         <Stack.Navigator>
             <Stack.Screen
                 name="OnBoarding"
-                component={OnBoarding}
+                component={Agendamentos}
                 options={{headerShown: false}}
             />
 
@@ -33,6 +35,13 @@ export default function Routes() {
                 component={Cadastro}
                 options={{headerShown: false}}
             />
+
+            <Stack.Screen
+                name="Agendamentos"
+                component={Agendamentos}
+                options={{headerShown: false}}
+            />
         </Stack.Navigator>
+        </Provider>
     );
 }
