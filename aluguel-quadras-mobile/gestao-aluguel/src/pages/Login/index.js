@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     buttonAcessar: {
-        backgroundColor: '#FF5722',
+        backgroundColor: '#007BFF',
         width: '100%',
         borderRadius: 8,
         paddingVertical: 8,
