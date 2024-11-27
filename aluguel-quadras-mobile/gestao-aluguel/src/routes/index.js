@@ -14,7 +14,7 @@ export default function Routes() {
         <Stack.Navigator>
             <Stack.Screen
                 name="OnBoarding"
-                component={Agendamentos}
+                component={OnBoarding}
                 options={{headerShown: false}}
             />
 
