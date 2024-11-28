@@ -5,6 +5,7 @@ import Login from '../pages/Login'
 import Home from '../pages/Home'
 import Cadastro from '../pages/Cadastro'
 import Agendamentos from '../pages/Agendamentos'
+import Perfil from '../pages/Perfil'
 import { Provider } from 'react-native-paper'
 const Stack = createNativeStackNavigator();
 
@@ -13,8 +14,8 @@ export default function Routes() {
       <Provider>
         <Stack.Navigator>
             <Stack.Screen
-                name="OnBoarding"
-                component={OnBoarding}
+                name="Perfil"
+                component={Perfil}
                 options={{headerShown: false}}
             />
 
@@ -41,6 +42,7 @@ export default function Routes() {
                 component={Agendamentos}
                 options={{headerShown: false}}
             />
+            
         </Stack.Navigator>
         </Provider>
     );
