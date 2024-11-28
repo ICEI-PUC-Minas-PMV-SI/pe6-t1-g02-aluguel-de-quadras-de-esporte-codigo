@@ -11,39 +11,44 @@ const Stack = createNativeStackNavigator();
 
 export default function Routes() {
     return (
-      <Provider>
-        <Stack.Navigator>
-            <Stack.Screen
-                name="Perfil"
-                component={Perfil}
-                options={{headerShown: false}}
-            />
+        <Provider>
+            <Stack.Navigator>
+                <Stack.Screen
+                    name="OnBoarding"
+                    component={OnBoarding}
+                    options={{ headerShown: false }}
+                />
 
-            <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{headerShown: false}}
-            />
+                <Stack.Screen
+                    name="Login"
+                    component={Login}
+                    options={{ headerShown: false }}
+                />
 
-            <Stack.Screen
-                name="Home"
-                component={Home}
-                options={{headerShown: false}}
-            />
+                <Stack.Screen
+                    name="Home"
+                    component={Home}
+                    options={{ headerShown: false }}
+                />
 
-            <Stack.Screen
-                name="Cadastro"
-                component={Cadastro}
-                options={{headerShown: false}}
-            />
+                <Stack.Screen
+                    name="Cadastro"
+                    component={Cadastro}
+                    options={{ headerShown: false }}
+                />
 
-            <Stack.Screen
-                name="Agendamentos"
-                component={Agendamentos}
-                options={{headerShown: false}}
-            />
-            
-        </Stack.Navigator>
+                <Stack.Screen
+                    name="Agendamentos"
+                    component={Agendamentos}
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name="Perfil"
+                    component={Perfil}
+                    options={{ headerShown: false }}
+                />
+            </Stack.Navigator>
         </Provider>
     );
 }
