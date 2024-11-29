@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -18,46 +18,90 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const schema = yup.object({
     name: yup.string().required('Campo obrigatório'),
     phone: yup.string()
-        .min(15, 'O telefone deve conter 11 números')
+        .max(14, 'O telefone deve conter 14 caracteres')
+        .min(14, 'O telefone deve conter 14 caracteres (xx) xxxxxxxxx')
         .required('O número de telefone é obrigatório'),
-    email: yup.string().email("E-mail inválido").required("Informe seu e-mail"),
     newpassword: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha"),
     confirmnewpassword: yup.string()
         .oneOf([yup.ref('newpassword'), null], 'As senhas devem ser iguais')
         .required('A confirmação de senha é obrigatória')
 });
 
-export default function Login() {
+export default function Perfil() {
 
     const navigation = useNavigation();
-    const { control, handleSubmit, formState: { errors } } = useForm({
+    const { control, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
     const [loading, setLoading] = useState(false);
+    const [userId, setUserId] = useState(null);
 
-    const handleLogin = async (data) => {
-        setLoading(true);
-        const loginData = {
-            email: data.email,
-            senha: data.password
+    const getProfileData = async () => {
+        console.log("chamou a função getProfileData");
+        try {
+            const id = await AsyncStorage.getItem('userId');
+            if (id) {
+                setUserId(id);
+                const response = await fetch(`http://10.0.2.2:8080/api/v1/usuarios/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json().catch(err => console.error("Erro ao fazer parse do JSON:", err));
+                    setValue('name', data.nome);
+                    setValue('phone', data.telefone);
+                } else {
+                    console.error(response.status);
+                    alert('Erro! Não foi possível carregar os dados do perfil.');
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao buscar os dados do usuário.');
+        }
+    };
+
+    useEffect(() => {
+        getProfileData();
+    }, []);
+
+    const handleUpdateProfile = async (data) => {
+        console.log("chamou a funcao update profile");
+        const profileData = {
+            senha: data.newpassword,
+            nome: data.name,
+            telefone: data.phone,
         };
 
+        console.log("Dados enviados:", profileData);
+
         try {
-            const response = await fetch('http://10.0.2.2:8080/api/v1/login', {
-                method: 'POST',
+            // Usando AbortController para limitar o tempo da requisição
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000); // 10 segundos de timeout
+            const token = await AsyncStorage.getItem('token');
+
+            const response = await fetch(`http://10.0.2.2:8080/api/v1/usuarios/${userId}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(loginData),
+                body: JSON.stringify(profileData),
+                signal: controller.signal, // Passando o signal para a requisição
             });
 
+            clearTimeout(timeout); // Limpar o timeout após a resposta
+
             if (response.ok) {
-                const result = await response.json();
-                await AsyncStorage.setItem('userToken', result.token);
+                alert('Sucesso! Perfil atualizado com sucesso!');
+                console.log('Navegando para Home');
                 navigation.navigate('Home');
             } else {
-                alert('Credenciais inválidas');
+                alert('Ocorreu um erro ao atualizar perfil');
             }
         } catch (error) {
             console.error(error);
@@ -96,8 +140,7 @@ export default function Login() {
                     control={control}
                     name="phone"
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <MaskedTextInput
-                            mask="(99) 99999-9999"
+                        <TextInput
                             onChangeText={onChange}
                             onBlur={onBlur}
                             value={value}
@@ -144,7 +187,7 @@ export default function Login() {
 
                 <TouchableOpacity
                     style={styles.buttonCadastrar}
-                    onPress={handleSubmit(handleLogin)}
+                    onPress={handleSubmit(handleUpdateProfile)}
                     disabled={loading}
                 >
                     <Text style={styles.buttonTextCadastrar}>{loading ? 'Carregando...' : 'Atualizar'}</Text>

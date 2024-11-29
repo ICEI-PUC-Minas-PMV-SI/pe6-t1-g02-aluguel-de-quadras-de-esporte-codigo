@@ -38,6 +38,7 @@ export default function Login() {
         }
 
         try {
+            //const response = await Network.fetchLogin()
             const response = await fetch('http://10.0.2.2:8080/api/v1/login', {
                 method: 'POST',
                 headers: {
@@ -48,14 +49,16 @@ export default function Login() {
 
             if (response.ok) {
                 const result = await response.json();
-                await AsyncStorage.setItem('userToken', result.token); // Salva o token
+                await AsyncStorage.setItem('userId', result.user.id);
+                await AsyncStorage.setItem('token', result.token);
+                console.log("navegando para o perfil");
                 navigation.navigate('Home');
             } else {
                 alert('Credenciais inválidas');
             }
         } catch (error) {
             console.error(error);
-            alert('Erro! Não foi possível se conectar ao servidor.');
+            alert('Erro login! Não foi possível se conectar ao servidor.');
         } finally {
             setLoading(false);
         }
