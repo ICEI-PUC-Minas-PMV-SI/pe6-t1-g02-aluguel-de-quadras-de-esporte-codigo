@@ -25,9 +25,9 @@ export default function TimePickerBr({...props}) {
 
   return (
     <SafeAreaProvider>
-      <View style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
+      <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 16}}>
         <Button onPress={() => setVisible(true)} uppercase={false} mode="outlined">
-          {hours && minutes ? `${hours}:${minutes}` : props.defaultMessage}
+          {hours || minutes ? `${hours}:${minutes}` : props.defaultMessage}
         </Button>
         <TimePickerModal
           locale="pt"

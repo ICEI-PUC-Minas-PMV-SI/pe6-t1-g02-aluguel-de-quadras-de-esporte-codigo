@@ -14,7 +14,13 @@ export default function EditAgendamento({...props}) {
 
   const showModal = () => setVisibleSingle(true);
   const hideModal = () => setVisibleSingle(false);
-  const containerStyle = {backgroundColor: 'white', padding: 20};
+  const containerStyle = {
+    backgroundColor: 'white',
+    padding: 20,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  };
 
   const onDismissSingle = React.useCallback(() => {
     setOpen(false);
@@ -36,7 +42,7 @@ export default function EditAgendamento({...props}) {
           <TextInput label="Quadra" value={props.quadra} onChangeText={text => setText(text)} disabled/>
 
           <SafeAreaProvider>
-            <View style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
+            <View style={{justifyContent: 'center', flex: 1, alignItems: 'center', marginTop: 16}}>
               <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
                 {date ? date.toLocaleDateString("pt-BR") : `Selecione uma data`}
               </Button>
@@ -47,6 +53,7 @@ export default function EditAgendamento({...props}) {
                 onDismiss={onDismissSingle}
                 date={date}
                 onConfirm={onConfirmSingle}
+                validRange={{startDate: new Date()}}
               />
             </View>
           </SafeAreaProvider>
@@ -56,10 +63,15 @@ export default function EditAgendamento({...props}) {
           <TimePickerBr defaultMessage="Fim agendamento" confirmFunction={(a, b) => {
             setHoraFim(`${a}:${b}`)
           }}/>
+
+          <Button mode="outlined" style={{marginTop: 16, display: 'flex'}}>
+            Salvar agendamento
+          </Button>
         </Modal>
       </Portal>
       <IconButton icon="folder-edit-outline" size={20} onPress={showModal} color={"#000000"}>>
       </IconButton>
+
     </>
   )
 }
