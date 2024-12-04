@@ -14,6 +14,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toastConfig } from '../../components/toast';
+import Toast from 'react-native-toast-message';
 
 const schema = yup.object({
     email: yup.string().email("E-mail inválido").required("Informe seu e-mail"),
@@ -35,26 +37,47 @@ export default function Login() {
         }
 
         try {
+            const controller = new AbortController();
+
+            // Configuração do timeout para 10 segundos
+            const timeout = setTimeout(() => {
+                controller.abort(); // Aborta a requisição
+                Toast.show({
+                    type: 'customToast',
+                    text1: 'Tempo Excedido',
+                    text2: 'A conexão demorou mais de 10 segundos. Tente novamente.',
+                });
+            }, 10000);
+
             const response = await fetch('http://10.0.2.2:8080/api/v1/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(loginData),
+                signal: controller.signal
             });
+
+            clearTimeout(timeout);
 
             if (response.ok) {
                 const result = await response.json();
                 await AsyncStorage.setItem('userId', result.user.id);
                 await AsyncStorage.setItem('token', result.token);
-                console.log("navegando para o perfil");
                 navigation.navigate('Home');
             } else {
-                alert('Credenciais inválidas');
+                Toast.show({
+                    type: 'customToast',
+                    text1: 'Erro de login',
+                    text2: 'Credenciais inválidas',
+                });
             }
         } catch (error) {
-            console.error(error);
-            alert('Erro login! Não foi possível se conectar ao servidor.');
+            Toast.show({
+                type: 'customToast',
+                text1: 'Erro de login',
+                text2: 'Não foi possível se conectar ao servidor',
+            });
         } finally {
             setLoading(false);
         }
@@ -110,6 +133,7 @@ export default function Login() {
                     >
                         <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
                     </TouchableOpacity>
+                    <Toast config={toastConfig} />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>

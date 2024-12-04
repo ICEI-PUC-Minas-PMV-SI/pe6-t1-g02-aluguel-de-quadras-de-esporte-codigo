@@ -14,11 +14,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toastConfig } from '../../components/toast';
+import Toast from 'react-native-toast-message';
 
 const schema = yup.object({
     name: yup.string().required('Campo obrigatório'),
     phone: yup.string()
-        .matches(/^$$\d{2}$$ \d{9}$/, "Formato: (xx) xxxxxxxxx")
+
         .required('O número de telefone é obrigatório'),
     newpassword: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha"),
     confirmnewpassword: yup.string()
@@ -52,12 +54,20 @@ export default function Perfil() {
                     setValue('phone', data.telefone);
                 } else {
                     console.error(response.status);
-                    alert('Erro! Não foi possível carregar os dados do perfil.');
+                    Toast.show({
+                        type: 'customToast',
+                        text1: 'Erro no perfil',
+                        text2: 'Não foi possível carregar os dados do perfil',
+                    });
                 }
             }
         } catch (error) {
             console.error(error);
-            alert('Erro ao buscar os dados do usuário.');
+            Toast.show({
+                type: 'customToast',
+                text1: 'Erro no perfil',
+                text2: 'Erro ao buscar os dados do usuário',
+            });
         }
     };
 
@@ -75,8 +85,17 @@ export default function Perfil() {
 
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 10000);
             const token = await AsyncStorage.getItem('token');
+
+            // Configuração do timeout para 10 segundos
+            const timeout = setTimeout(() => {
+                controller.abort(); // Aborta a requisição
+                Toast.show({
+                    type: 'customToast',
+                    text1: 'Tempo Excedido',
+                    text2: 'A conexão demorou mais de 10 segundos. Tente novamente.',
+                });
+            }, 10000);
 
             const response = await fetch(`http://10.0.2.2:8080/api/v1/usuarios/${userId}`, {
                 method: 'PUT',
@@ -91,14 +110,20 @@ export default function Perfil() {
             clearTimeout(timeout);
 
             if (response.ok) {
-                alert('Sucesso! Perfil atualizado com sucesso!');
                 navigation.navigate('Home');
             } else {
-                alert('Ocorreu um erro ao atualizar perfil');
+                Toast.show({
+                    type: 'customToast',
+                    text1: 'Erro no perfil',
+                    text2: 'Ocorreu um erro ao atualizar perfil',
+                });
             }
         } catch (error) {
-            console.error(error);
-            alert('Erro! Não foi possível se conectar ao servidor.');
+            Toast.show({
+                type: 'customToast',
+                text1: 'Erro no perfil',
+                text2: 'Não foi possível se conectar ao servidor',
+            });
         } finally {
             setLoading(false);
         }
@@ -150,6 +175,7 @@ export default function Perfil() {
                             {loading ? "Carregando..." : "Atualizar"}
                         </Text>
                     </TouchableOpacity>
+                    <Toast config={toastConfig} />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
