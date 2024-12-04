@@ -5,14 +5,14 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-
 import { useNavigation } from "@react-navigation/native";
-
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const schema = yup.object({
@@ -21,12 +21,19 @@ const schema = yup.object({
     .string()
     .min(6, "A senha deve conter pelo menos 6 caracteres")
     .required("Informe sua senha"),
-    name:yup.string().required("Digite seu nome")
+  name: yup.string().required("Digite seu nome"),
+  phone: yup.string()
+        .max(14, 'O telefone deve conter 14 caracteres')
+        .min(14, 'O telefone deve conter 14 caracteres (xx) xxxxxxxxx')
+        .required('O número de telefone é obrigatório'),
+  cpf: yup
+    .string()
+    .matches(/^\d{11}$/, "CPF deve conter 11 dígitos")
+    .required("Digite seu CPF"),
 });
 
 export default function Cadastro() {
   const navigation = useNavigation();
-
   const {
     control,
     handleSubmit,
@@ -34,31 +41,38 @@ export default function Cadastro() {
   } = useForm({
     resolver: yupResolver(schema),
   });
-
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (data) => {
+  const handleSignUp = async (data) => {
     setLoading(true);
-    const loginData = {
+    const signUpData = {
       email: data.email,
+      nome:  data.name,
       senha: data.password,
+      telefone: data.phone,
+      cpf:      data.cpf,
+      cnpj:     "null"
     };
 
     try {
-      const response = await fetch("http://10.0.2.2:8080/api/v1/login", {
+      console.log("Enviando dados:", JSON.stringify(signUpData));
+      const response = await fetch("http://10.0.2.2:8080/api/v1/usuarios", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify(signUpData),
       });
 
+      const responseData = await response.json();
+      console.log("Resposta do servidor:", JSON.stringify(responseData));
       if (response.ok) {
         const result = await response.json();
-        await AsyncStorage.setItem("userToken", result.token); // Salva o token
-        navigation.navigate("Home");
+        await AsyncStorage.setItem("userToken", result.token);
+        navigation.navigate("Login");
       } else {
-        alert("Credenciais inválidas");
+        alert("Erro", responseData.message || "Erro ao cadastrar usuário");
+        
       }
     } catch (error) {
       console.error(error);
@@ -68,162 +82,132 @@ export default function Cadastro() {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.containerHeader}>
-        <Text style={styles.message}>Faça seu cadastro</Text>
-      </View>
-
-      <View style={styles.containerForm}>
-        <Text style={styles.title}>Nome</Text>
-
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Digite seu nome"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              style={styles.input}
-            />
-          )}
-        />
-        {errors.name && (
-          <Text style={styles.labelError}>{errors.name?.message}</Text>
+  const renderInput = (name, placeholder, secureTextEntry = false) => (
+    <View style={styles.inputContainer}>
+      <Text style={styles.label}>{placeholder}</Text>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder={placeholder}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            value={value}
+            style={styles.input}
+            secureTextEntry={secureTextEntry}
+            placeholderTextColor="#888"
+          />
         )}
-
-        <Text style={styles.title}>E-mail</Text>
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Digite seu e-mail"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              style={styles.input}
-            />
-          )}
-        />
-        {errors.email && (
-          <Text style={styles.labelError}>{errors.email?.message}</Text>
-        )}
-
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Digite sua senha"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              style={styles.input}
-              secureTextEntry={true}
-            />
-          )}
-        />
-        {errors.password && (
-          <Text style={styles.labelError}>{errors.password?.message}</Text>
-        )}
-
-        <TouchableOpacity
-          style={styles.buttonAcessar}
-          onPress={handleSubmit(handleLogin)}
-          disabled={loading}
-        >
-          <Text style={styles.buttonTextAcessar}>
-            {loading ? "Carregando..." : "Acessar"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.buttonCadastro}
-          onPress={() => navigation.navigate("Cadastro")}
-        >
-          <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
-        </TouchableOpacity>
-      </View>
+      />
+      {errors[name] && (
+        <Text style={styles.errorText}>{errors[name]?.message}</Text>
+      )}
     </View>
+  );
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>Faça seu cadastro</Text>
+        </View>
+        <View style={styles.formContainer}>
+          {renderInput("name", "Nome")}
+          {renderInput("phone", "Telefone")}
+          {renderInput("email", "E-mail")}
+          {renderInput("password", "Senha", true)}
+          {renderInput("cpf", "CPF")}
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit(handleSignUp)}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Carregando..." : "Cadastrar"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFF",
     flex: 1,
+    backgroundColor: "#121212",
   },
-  containerHeader: {
-    marginTop: "14%",
-    marginBottom: "8%",
-    paddingStart: "5%",
+  scrollContainer: {
+    flexGrow: 1,
   },
-  message: {
+  headerContainer: {
+    backgroundColor: "#1E1E1E",
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerText: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
-  containerForm: {
+  formContainer: {
     flex: 1,
-    backgroundColor: "#000",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    paddingStart: "5%",
-    paddingEnd: "5%",
+    backgroundColor: "#1E1E1E",
+    margin: 20,
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  title: {
-    fontSize: 20,
-    marginTop: 28,
-    color: "#FFF",
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#E0E0E0",
+    marginBottom: 5,
   },
   input: {
-    borderBottomWidth: 1,
-    backgroundColor: "#FFF",
-    color: "#000",
-    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "#333",
     borderRadius: 8,
-    height: 56,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     fontSize: 16,
+    color: "#FFFFFF",
+    backgroundColor: "#2C2C2C",
   },
-  buttonAcessar: {
+  errorText: {
+    color: "#ff6b6b",
+    fontSize: 14,
+    marginTop: 5,
+  },
+  button: {
     backgroundColor: "#007BFF",
-    width: "100%",
     borderRadius: 8,
-    paddingVertical: 8,
-    marginTop: 48,
-    justifyContent: "center",
+    paddingVertical: 15,
     alignItems: "center",
+    marginTop: 20,
   },
-  buttonTextAcessar: {
+  buttonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
-    textAlign: "center",
-  },
-  buttonCadastro: {
-    backgroundColor: "#FFF",
-    width: "100%",
-    borderRadius: 8,
-    paddingVertical: 8,
-    marginTop: 24,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonTextCadastrar: {
-    fontSize: 18,
-    color: "#000",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  labelError: {
-    alignSelf: "flex-start",
-    color: "#ff375b",
-    marginBottom: 8,
   },
 });
-
 
