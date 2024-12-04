@@ -4,15 +4,15 @@ import {
     Text,
     StyleSheet,
     TextInput,
-    TouchableOpacity
+    TouchableOpacity,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
 } from 'react-native';
-
 import { useNavigation } from '@react-navigation/native';
-
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const schema = yup.object({
@@ -21,13 +21,10 @@ const schema = yup.object({
 })
 
 export default function Login() {
-
     const navigation = useNavigation();
-
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     })
-
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async (data) => {
@@ -38,7 +35,6 @@ export default function Login() {
         }
 
         try {
-            //const response = await Network.fetchLogin()
             const response = await fetch('http://10.0.2.2:8080/api/v1/login', {
                 method: 'POST',
                 headers: {
@@ -64,138 +60,145 @@ export default function Login() {
         }
     }
 
-    return (
-        <View style={styles.container}>
-
-            <View style={styles.containerHeader}>
-                <Text style={styles.message}>Bem-vindo(a)</Text>
-            </View>
-
-            <View style={styles.containerForm}>
-
-                <Text style={styles.title}>E-mail</Text>
-
-                <Controller
-                    control={control}
-                    name="email"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            placeholder="Digite seu e-mail"
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            style={styles.input}
-                        />
-                    )}
-                />
-                {errors.email && <Text style={styles.labelError}>{errors.email?.message}</Text>}
-
-
-                <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            placeholder="Digite sua senha"
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            style={styles.input}
-                            secureTextEntry={true}
-                        />
-                    )}
-                />
-                {errors.password && <Text style={styles.labelError}>{errors.password?.message}</Text>}
-
-                <TouchableOpacity
-                    style={styles.buttonAcessar}
-                    onPress={handleSubmit(handleLogin)}
-                    disabled={loading}
-                >
-                    <Text style={styles.buttonTextAcessar}>{loading ? 'Carregando...' : 'Acessar'}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.buttonCadastro}
-                    onPress={() => navigation.navigate("Cadastro")}
-                >
-                    <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
-                </TouchableOpacity>
-            </View>
+    const renderInput = (name, placeholder, secureTextEntry = false) => (
+        <View style={styles.inputContainer}>
+            <Text style={styles.title}>{placeholder}</Text>
+            <Controller
+                control={control}
+                name={name}
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        placeholder={placeholder}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        value={value}
+                        style={styles.input}
+                        secureTextEntry={secureTextEntry}
+                        placeholderTextColor="#888"
+                    />
+                )}
+            />
+            {errors[name] && <Text style={styles.labelError}>{errors[name]?.message}</Text>}
         </View>
+    )
+
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.container}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.containerHeader}>
+                    <Text style={styles.message}>Bem-vindo(a)</Text>
+                </View>
+
+                <View style={styles.containerForm}>
+                    {renderInput("email", "E-mail")}
+                    {renderInput("password", "Senha", true)}
+
+                    <TouchableOpacity
+                        style={styles.buttonAcessar}
+                        onPress={handleSubmit(handleLogin)}
+                        disabled={loading}
+                    >
+                        <Text style={styles.buttonTextAcessar}>{loading ? 'Carregando...' : 'Acessar'}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.buttonCadastro}
+                        onPress={() => navigation.navigate("Cadastro")}
+                    >
+                        <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFF',
         flex: 1,
+        backgroundColor: "#121212",
+    },
+    scrollContainer: {
+        flexGrow: 1,
     },
     containerHeader: {
-        marginTop: '14%',
-        marginBottom: '8%',
-        paddingStart: '5%'
+        backgroundColor: "#1E1E1E",
+        paddingVertical: 30,
+        paddingHorizontal: 20,
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
     },
     message: {
         fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000'
+        fontWeight: "bold",
+        color: "#FFFFFF",
+        textAlign: "center",
     },
     containerForm: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: "#1E1E1E",
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
-        paddingStart: '5%',
-        paddingEnd: '5%'
+        paddingHorizontal: 20,
+        paddingTop: 30,
+        marginTop: -25,
+    },
+    inputContainer: {
+        marginBottom: 20,
     },
     title: {
-        fontSize: 20,
-        marginTop: 28,
-        color: '#FFF'
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#E0E0E0",
+        marginBottom: 5,
     },
     input: {
-        borderBottomWidth: 1,
-        backgroundColor: '#FFF',
-        color: '#000',
-        marginTop: 12,
+        borderWidth: 1,
+        borderColor: "#333",
         borderRadius: 8,
-        height: 56,
-        fontSize: 16
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        fontSize: 16,
+        color: "#FFFFFF",
+        backgroundColor: "#2C2C2C",
     },
     buttonAcessar: {
-        backgroundColor: '#007BFF',
-        width: '100%',
+        backgroundColor: "#007BFF",
+        width: "100%",
         borderRadius: 8,
-        paddingVertical: 8,
-        marginTop: 48,
-        justifyContent: 'center',
-        alignItems: 'center'
+        paddingVertical: 15,
+        marginTop: 20,
+        justifyContent: "center",
+        alignItems: "center",
     },
     buttonTextAcessar: {
-        color: '#FFFFFF',
+        color: "#FFFFFF",
         fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center'
+        fontWeight: "bold",
+        textAlign: "center"
     },
     buttonCadastro: {
-        backgroundColor: '#FFF',
-        width: '100%',
+        backgroundColor: "#2C2C2C",
+        width: "100%",
         borderRadius: 8,
-        paddingVertical: 8,
-        marginTop: 24,
-        justifyContent: 'center',
-        alignItems: 'center'
+        paddingVertical: 15,
+        marginTop: 15,
+        justifyContent: "center",
+        alignItems: "center",
     },
     buttonTextCadastrar: {
         fontSize: 18,
-        color: '#000',
-        textAlign: 'center',
-        fontWeight: 'bold'
+        color: "#007BFF",
+        textAlign: "center",
+        fontWeight: "bold"
     },
     labelError: {
-        alignSelf: 'flex-start',
-        color: '#ff375b',
-        marginBottom: 8,
+        color: "#ff6b6b",
+        fontSize: 14,
+        marginTop: 5,
     }
-})
+});
+

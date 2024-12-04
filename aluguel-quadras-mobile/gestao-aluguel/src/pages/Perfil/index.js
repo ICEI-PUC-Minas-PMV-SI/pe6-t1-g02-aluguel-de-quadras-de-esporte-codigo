@@ -4,22 +4,21 @@ import {
     Text,
     StyleSheet,
     TextInput,
-    TouchableOpacity
+    TouchableOpacity,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
-
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { MaskedTextInput } from 'react-native-mask-text';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const schema = yup.object({
     name: yup.string().required('Campo obrigatório'),
     phone: yup.string()
-        .max(14, 'O telefone deve conter 14 caracteres')
-        .min(14, 'O telefone deve conter 14 caracteres (xx) xxxxxxxxx')
+        .matches(/^$$\d{2}$$ \d{9}$/, "Formato: (xx) xxxxxxxxx")
         .required('O número de telefone é obrigatório'),
     newpassword: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha"),
     confirmnewpassword: yup.string()
@@ -28,7 +27,6 @@ const schema = yup.object({
 });
 
 export default function Perfil() {
-
     const navigation = useNavigation();
     const { control, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
@@ -38,7 +36,6 @@ export default function Perfil() {
     const [userId, setUserId] = useState(null);
 
     const getProfileData = async () => {
-        console.log("chamou a função getProfileData");
         try {
             const id = await AsyncStorage.getItem('userId');
             if (id) {
@@ -50,7 +47,7 @@ export default function Perfil() {
                     }
                 });
                 if (response.ok) {
-                    const data = await response.json().catch(err => console.error("Erro ao fazer parse do JSON:", err));
+                    const data = await response.json();
                     setValue('name', data.nome);
                     setValue('phone', data.telefone);
                 } else {
@@ -69,19 +66,16 @@ export default function Perfil() {
     }, []);
 
     const handleUpdateProfile = async (data) => {
-        console.log("chamou a funcao update profile");
+        setLoading(true);
         const profileData = {
             senha: data.newpassword,
             nome: data.name,
             telefone: data.phone,
         };
 
-        console.log("Dados enviados:", profileData);
-
         try {
-            // Usando AbortController para limitar o tempo da requisição
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 10000); // 10 segundos de timeout
+            const timeout = setTimeout(() => controller.abort(), 10000);
             const token = await AsyncStorage.getItem('token');
 
             const response = await fetch(`http://10.0.2.2:8080/api/v1/usuarios/${userId}`, {
@@ -91,14 +85,13 @@ export default function Perfil() {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(profileData),
-                signal: controller.signal, // Passando o signal para a requisição
+                signal: controller.signal,
             });
 
-            clearTimeout(timeout); // Limpar o timeout após a resposta
+            clearTimeout(timeout);
 
             if (response.ok) {
                 alert('Sucesso! Perfil atualizado com sucesso!');
-                console.log('Navegando para Home');
                 navigation.navigate('Home');
             } else {
                 alert('Ocorreu um erro ao atualizar perfil');
@@ -111,146 +104,122 @@ export default function Perfil() {
         }
     };
 
-    return (
-        <View style={styles.container}>
-
-            <View style={styles.containerHeader}>
-                <Text style={styles.message}>Atualize seu perfil</Text>
-            </View>
-
-            <View style={styles.containerForm}>
-
-                <Text style={styles.title}>Nome</Text>
-                <Controller
-                    control={control}
-                    name="name"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            style={styles.input}
-                        />
-                    )}
-                />
-                {errors.name && <Text style={styles.labelError}>{errors.name?.message}</Text>}
-
-                <Text style={styles.title}>Telefone</Text>
-                <Controller
-                    control={control}
-                    name="phone"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            style={styles.input}
-                            keyboardType="numeric"
-                        />
-                    )}
-                />
-                {errors.phone && <Text style={styles.labelError}>{errors.phone?.message}</Text>}
-
-                <Text style={styles.title}>Nova senha</Text>
-                <Controller
-                    control={control}
-                    name="newpassword"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            placeholder="Digite sua nova senha"
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            style={styles.input}
-                            secureTextEntry
-                        />
-                    )}
-                />
-                {errors.newpassword && <Text style={styles.labelError}>{errors.newpassword?.message}</Text>}
-
-                <Text style={styles.title}>Confirmar nova senha</Text>
-                <Controller
-                    control={control}
-                    name="confirmnewpassword"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            placeholder="Confirme sua nova senha"
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            style={styles.input}
-                            secureTextEntry
-                        />
-                    )}
-                />
-                {errors.confirmnewpassword && <Text style={styles.labelError}>{errors.confirmnewpassword?.message}</Text>}
-
-                <TouchableOpacity
-                    style={styles.buttonCadastrar}
-                    onPress={handleSubmit(handleUpdateProfile)}
-                    disabled={loading}
-                >
-                    <Text style={styles.buttonTextCadastrar}>{loading ? 'Carregando...' : 'Atualizar'}</Text>
-                </TouchableOpacity>
-            </View>
+    const renderInput = (name, placeholder, secureTextEntry = false) => (
+        <View style={styles.inputContainer}>
+            <Text style={styles.label}>{placeholder}</Text>
+            <Controller
+                control={control}
+                name={name}
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        placeholder={placeholder}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        value={value}
+                        style={styles.input}
+                        secureTextEntry={secureTextEntry}
+                        placeholderTextColor="#888"
+                    />
+                )}
+            />
+            {errors[name] && <Text style={styles.labelError}>{errors[name]?.message}</Text>}
         </View>
+    );
+
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.container}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.headerText}>Atualize seu perfil</Text>
+                </View>
+                <View style={styles.formContainer}>
+                    {renderInput("name", "Nome")}
+                    {renderInput("phone", "Telefone")}
+                    {renderInput("newpassword", "Nova senha", true)}
+                    {renderInput("confirmnewpassword", "Confirmar nova senha", true)}
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={handleSubmit(handleUpdateProfile)}
+                        disabled={loading}
+                    >
+                        <Text style={styles.buttonText}>
+                            {loading ? "Carregando..." : "Atualizar"}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFF',
         flex: 1,
+        backgroundColor: "#121212",
     },
-    containerHeader: {
-        marginBottom: '1%',
-        alignSelf: 'center',
-        alignContent: 'center',
+    scrollContainer: {
+        flexGrow: 1,
     },
-    message: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#000'
+    headerContainer: {
+        backgroundColor: "#1E1E1E",
+        paddingVertical: 30,
+        paddingHorizontal: 20,
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
     },
-    containerForm: {
+    headerText: {
+        fontSize: 28,
+        fontWeight: "bold",
+        color: "#FFFFFF",
+        textAlign: "center",
+    },
+    formContainer: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: "#1E1E1E",
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
-        paddingStart: '5%',
-        paddingEnd: '5%'
+        paddingHorizontal: 20,
+        paddingTop: 30,
+        marginTop: -25,
     },
-    title: {
+    inputContainer: {
+        marginBottom: 20,
+    },
+    label: {
         fontSize: 16,
-        marginTop: 20,
-        color: '#FFF'
+        fontWeight: "600",
+        color: "#E0E0E0",
+        marginBottom: 5,
     },
     input: {
-        borderBottomWidth: 1,
-        backgroundColor: '#FFF',
-        color: '#000',
-        marginTop: 12,
+        borderWidth: 1,
+        borderColor: "#333",
         borderRadius: 8,
-        height: 48,
-        fontSize: 16
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        fontSize: 16,
+        color: "#FFFFFF",
+        backgroundColor: "#2C2C2C",
     },
-    buttonCadastrar: {
-        backgroundColor: '#007BFF',
-        width: '100%',
+    button: {
+        backgroundColor: "#007BFF",
         borderRadius: 8,
-        paddingVertical: 8,
-        marginTop: 48,
-        justifyContent: 'center',
-        alignItems: 'center'
+        paddingVertical: 15,
+        alignItems: "center",
+        marginTop: 20,
     },
-    buttonTextCadastrar: {
-        color: '#FFFFFF',
+    buttonText: {
+        color: "#FFFFFF",
         fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center'
+        fontWeight: "bold",
     },
     labelError: {
-        alignSelf: 'flex-start',
-        color: '#ff375b'
-    }
+        color: "#ff6b6b",
+        fontSize: 14,
+        marginTop: 5,
+    },
 });
