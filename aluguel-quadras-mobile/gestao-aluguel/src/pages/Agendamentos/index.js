@@ -1,7 +1,8 @@
 import {
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    TouchableOpacity,
 } from 'react-native';
 import EditAgendamento from './editAgendamento'
 import {
@@ -38,7 +39,7 @@ export default function Agendamentos(props) {
     ])
 
     function cancelarAgendamento(id) {
-        const copyAgendamentos = [...agendamentos]
+        copyAgendamentos = [...agendamentos]
         for (let i = 0; i < copyAgendamentos.length; i++) {
             if (copyAgendamentos[i].id === id) {
                 copyAgendamentos[i].status = 0
