@@ -33,7 +33,7 @@ export default function Home() {
 
                 <TouchableOpacity
                 style={styles.buttonMenu}
-                onPress={() => navigation.navigate("Cadastro")}
+                onPress={() => navigation.navigate("Perfil")}
                 >
                     <Text style={styles.buttonText}>Perfil</Text>
                 </TouchableOpacity>

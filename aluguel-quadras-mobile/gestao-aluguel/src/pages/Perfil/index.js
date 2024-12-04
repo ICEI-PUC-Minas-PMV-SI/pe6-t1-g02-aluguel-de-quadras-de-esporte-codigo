@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TextInput,
     TouchableOpacity,
+    ScrollView,
     KeyboardAvoidingView,
     Platform,
-    ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
@@ -18,26 +18,74 @@ import { toastConfig } from '../../components/toast';
 import Toast from 'react-native-toast-message';
 
 const schema = yup.object({
-    email: yup.string().email("E-mail inválido").required("Informe seu e-mail"),
-    password: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha")
-})
+    name: yup.string().required('Campo obrigatório'),
+    phone: yup.string()
 
-export default function Login() {
+        .required('O número de telefone é obrigatório'),
+    newpassword: yup.string().min(6, "A senha deve conter pelo menos 6 caracteres").required("Informe sua senha"),
+    confirmnewpassword: yup.string()
+        .oneOf([yup.ref('newpassword'), null], 'As senhas devem ser iguais')
+        .required('A confirmação de senha é obrigatória')
+});
+
+export default function Perfil() {
     const navigation = useNavigation();
-    const { control, handleSubmit, formState: { errors } } = useForm({
+    const { control, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
-    })
-    const [loading, setLoading] = useState(false);
+    });
 
-    const handleLogin = async (data) => {
-        setLoading(true);
-        const loginData = {
-            email: data.email,
-            senha: data.password
+    const [loading, setLoading] = useState(false);
+    const [userId, setUserId] = useState(null);
+
+    const getProfileData = async () => {
+        try {
+            const id = await AsyncStorage.getItem('userId');
+            if (id) {
+                setUserId(id);
+                const response = await fetch(`http://10.0.2.2:8080/api/v1/usuarios/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setValue('name', data.nome);
+                    setValue('phone', data.telefone);
+                } else {
+                    console.error(response.status);
+                    Toast.show({
+                        type: 'customToast',
+                        text1: 'Erro no perfil',
+                        text2: 'Não foi possível carregar os dados do perfil',
+                    });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            Toast.show({
+                type: 'customToast',
+                text1: 'Erro no perfil',
+                text2: 'Erro ao buscar os dados do usuário',
+            });
         }
+    };
+
+    useEffect(() => {
+        getProfileData();
+    }, []);
+
+    const handleUpdateProfile = async (data) => {
+        setLoading(true);
+        const profileData = {
+            senha: data.newpassword,
+            nome: data.name,
+            telefone: data.phone,
+        };
 
         try {
             const controller = new AbortController();
+            const token = await AsyncStorage.getItem('token');
 
             // Configuração do timeout para 10 segundos
             const timeout = setTimeout(() => {
@@ -49,43 +97,41 @@ export default function Login() {
                 });
             }, 10000);
 
-            const response = await fetch('http://10.0.2.2:8080/api/v1/login', {
-                method: 'POST',
+            const response = await fetch(`http://10.0.2.2:8080/api/v1/usuarios/${userId}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(loginData),
-                signal: controller.signal
+                body: JSON.stringify(profileData),
+                signal: controller.signal,
             });
 
             clearTimeout(timeout);
 
             if (response.ok) {
-                const result = await response.json();
-                await AsyncStorage.setItem('userId', result.user.id);
-                await AsyncStorage.setItem('token', result.token);
                 navigation.navigate('Home');
             } else {
                 Toast.show({
                     type: 'customToast',
-                    text1: 'Erro de login',
-                    text2: 'Credenciais inválidas',
+                    text1: 'Erro no perfil',
+                    text2: 'Ocorreu um erro ao atualizar perfil',
                 });
             }
         } catch (error) {
             Toast.show({
                 type: 'customToast',
-                text1: 'Erro de login',
+                text1: 'Erro no perfil',
                 text2: 'Não foi possível se conectar ao servidor',
             });
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const renderInput = (name, placeholder, secureTextEntry = false) => (
         <View style={styles.inputContainer}>
-            <Text style={styles.title}>{placeholder}</Text>
+            <Text style={styles.label}>{placeholder}</Text>
             <Controller
                 control={control}
                 name={name}
@@ -103,7 +149,7 @@ export default function Login() {
             />
             {errors[name] && <Text style={styles.labelError}>{errors[name]?.message}</Text>}
         </View>
-    )
+    );
 
     return (
         <KeyboardAvoidingView
@@ -111,27 +157,23 @@ export default function Login() {
             style={styles.container}
         >
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.containerHeader}>
-                    <Text style={styles.message}>Bem-vindo(a)</Text>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.headerText}>Atualize seu perfil</Text>
                 </View>
-
-                <View style={styles.containerForm}>
-                    {renderInput("email", "E-mail")}
-                    {renderInput("password", "Senha", true)}
+                <View style={styles.formContainer}>
+                    {renderInput("name", "Nome")}
+                    {renderInput("phone", "Telefone")}
+                    {renderInput("newpassword", "Nova senha", true)}
+                    {renderInput("confirmnewpassword", "Confirmar nova senha", true)}
 
                     <TouchableOpacity
-                        style={styles.buttonAcessar}
-                        onPress={handleSubmit(handleLogin)}
+                        style={styles.button}
+                        onPress={handleSubmit(handleUpdateProfile)}
                         disabled={loading}
                     >
-                        <Text style={styles.buttonTextAcessar}>{loading ? 'Carregando...' : 'Acessar'}</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.buttonCadastro}
-                        onPress={() => navigation.navigate("Cadastro")}
-                    >
-                        <Text style={styles.buttonTextCadastrar}>Cadastrar</Text>
+                        <Text style={styles.buttonText}>
+                            {loading ? "Carregando..." : "Atualizar"}
+                        </Text>
                     </TouchableOpacity>
                     <Toast config={toastConfig} />
                 </View>
@@ -148,20 +190,20 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
     },
-    containerHeader: {
+    headerContainer: {
         backgroundColor: "#1E1E1E",
         paddingVertical: 30,
         paddingHorizontal: 20,
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
     },
-    message: {
+    headerText: {
         fontSize: 28,
         fontWeight: "bold",
         color: "#FFFFFF",
         textAlign: "center",
     },
-    containerForm: {
+    formContainer: {
         flex: 1,
         backgroundColor: "#1E1E1E",
         borderTopLeftRadius: 25,
@@ -173,7 +215,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         marginBottom: 20,
     },
-    title: {
+    label: {
         fontSize: 16,
         fontWeight: "600",
         color: "#E0E0E0",
@@ -189,40 +231,21 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
         backgroundColor: "#2C2C2C",
     },
-    buttonAcessar: {
+    button: {
         backgroundColor: "#007BFF",
-        width: "100%",
         borderRadius: 8,
         paddingVertical: 15,
-        marginTop: 20,
-        justifyContent: "center",
         alignItems: "center",
+        marginTop: 20,
     },
-    buttonTextAcessar: {
+    buttonText: {
         color: "#FFFFFF",
         fontSize: 18,
         fontWeight: "bold",
-        textAlign: "center"
-    },
-    buttonCadastro: {
-        backgroundColor: "#2C2C2C",
-        width: "100%",
-        borderRadius: 8,
-        paddingVertical: 15,
-        marginTop: 15,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    buttonTextCadastrar: {
-        fontSize: 18,
-        color: "#007BFF",
-        textAlign: "center",
-        fontWeight: "bold"
     },
     labelError: {
         color: "#ff6b6b",
         fontSize: 14,
         marginTop: 5,
-    }
+    },
 });
-
