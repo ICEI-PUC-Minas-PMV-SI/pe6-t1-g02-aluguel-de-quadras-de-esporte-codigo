@@ -39,7 +39,7 @@ export default function Agendamentos(props) {
     ])
 
     function cancelarAgendamento(id) {
-        copyAgendamentos = [...agendamentos]
+        const copyAgendamentos = [...agendamentos]
         for (let i = 0; i < copyAgendamentos.length; i++) {
             if (copyAgendamentos[i].id === id) {
                 copyAgendamentos[i].status = 0
@@ -64,6 +64,7 @@ export default function Agendamentos(props) {
                 {
                     agendamentos.map((agendamento) =>
                         <List.Item
+                            key = {agendamento.id}
                             title={`${agendamento.nome} - ${agendamento.data}`}
                             description={`${agendamento.horaInicio} - ${agendamento.horaFim} ${agendamento.local}`}
                             left={props => <List.Icon {...props} color={"#000000"} icon="alarm"/>}

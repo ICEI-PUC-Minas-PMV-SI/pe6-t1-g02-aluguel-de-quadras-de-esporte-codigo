@@ -69,9 +69,8 @@ export default function EditAgendamento({...props}) {
           </Button>
         </Modal>
       </Portal>
-      <IconButton icon="folder-edit-outline" size={20} onPress={showModal} color={"#000000"}>>
+      <IconButton icon="folder-edit-outline" size={20} onPress={showModal} color={"#000000"}>
       </IconButton>
-
     </>
   )
 }
